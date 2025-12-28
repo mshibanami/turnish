@@ -11,7 +11,7 @@
     "build": "vite build",
     "dev": "vite",
     "prepare": "npm run build",
-    "test": "npm run build && vitest",
+    "test": "npm run build && vitest run",
     "typecheck": "tsc --noEmit",
     "changeset": "changeset",
     "changeset:version": "changeset version",

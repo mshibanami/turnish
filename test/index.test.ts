@@ -1,4 +1,4 @@
-import Turnish from '../src';
+import Turnish from '@/index';
 import { describe, it, expect } from 'vitest';
 import { Rule } from '@/rules';
 import { ExtendedNode } from '@/node';
