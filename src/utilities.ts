@@ -88,7 +88,6 @@ export function sanitizedLinkContent(content: string): string {
   return sanitized
     .replace(/[\t\r\n]+/g, ' ')
     .replace(/ {2,}/g, ' ')
-    .replace(/([()])/g, '\\$1')
     .trim();
 }
 
