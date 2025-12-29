@@ -1,5 +1,11 @@
 # turnish
 
+## 1.4.0
+
+### Minor Changes
+
+- 9c2b00c: Fix linked image sanitization
+
 ## 1.3.0
 
 ### Minor Changes
