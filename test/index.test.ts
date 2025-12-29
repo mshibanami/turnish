@@ -1256,4 +1256,10 @@ describe('Turnish', () => {
         const input = "<ol>\n      <li>Item 1</li>\n      <li>Item 2</li>\n    </ol>";
         expect(turnish.render(input)).toBe("1.    Item 1\n2.    Item 2");
     });
+
+    it('handles linked images with titles', () => {
+        const turnish = new Turnish();
+        const input = '<a href="https://example.com"><img src="https://placehold.co/600x400/EEE/31343C" alt="Placeholder Image" /></a>';
+        expect(turnish.render(input)).toBe('[![Placeholder Image](https://placehold.co/600x400/EEE/31343C)](https://example.com)');
+    });
 });
