@@ -452,6 +452,12 @@ describe('Turnish', () => {
         expect(turnish.render(input)).toBe(read('pre-code-block-with-multiple-new-lines.md'));
     });
 
+    it('pre without <code>', () => {
+        const turnish = new Turnish();
+        const input = read('pre-without-code.html');
+        expect(turnish.render(input)).toBe(read('pre-without-code.md'));
+    });
+
     it('fenced pre/code block', () => {
         const turnish = new Turnish({ codeBlockStyle: "fenced" });
         const input = "<pre><code>def a_fenced_code block; end</code></pre>";
