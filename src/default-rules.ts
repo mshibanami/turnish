@@ -123,18 +123,16 @@ defaultRules.fencedCodeBlock = {
     return !!(
       options &&
       options.codeBlockStyle === 'fenced' &&
-      node.nodeName === 'PRE' &&
-      node.firstChild &&
-      (node.firstChild as Element).nodeName === 'CODE'
+      node.nodeName === 'PRE'
     );
   },
   replacement: function (_content: string, node: Node, options: TurnishOptions): string {
-    if (!node.firstChild) {
-      return '';
-    }
-    const codeElem = node.firstChild as Element;
+    const preNode = node as Element;
+    const firstChild = preNode.firstChild;
+    const codeElem = (firstChild && firstChild.nodeName === 'CODE') ? firstChild as Element : preNode;
+
     const className = codeElem.getAttribute('class') || '';
-    const language = (className.match(/language-(\S+)/) || [null, ''])[1];
+    const language = (className.match(/(?:lang|language)-(\S+)/) || [null, ''])[1];
     const code = codeElem.textContent || '';
     const fenceChar = options.fence?.charAt(0) || '`';
     let fenceSize = 3;

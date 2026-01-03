@@ -472,10 +472,16 @@ describe('Turnish', () => {
 
     it('escaping ~~~', () => {
         const turnish = new Turnish();
-        const input = "<pre>~~~ foo</pre>";
-        expect(turnish.render(input)).toBe("\\~~~ foo");
+        const input = "<pre>~~~\nfoo</pre>";
+        expect(turnish.render(input)).toBe("```\n~~~\nfoo\n```");
     });
 
+    it('escaping 3 fence characters', () => {
+        const turnish = new Turnish();
+        const input = "<pre>```\nfoo</pre>";
+        expect(turnish.render(input)).toBe("````\n```\nfoo\n````");
+    });
+    
     it('not escaping ~~~', () => {
         const turnish = new Turnish();
         const input = "A sentence containing ~~~";
