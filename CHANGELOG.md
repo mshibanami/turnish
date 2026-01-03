@@ -1,5 +1,11 @@
 # turnish
 
+## 1.5.0
+
+### Minor Changes
+
+- Update the default behavior of `pre` tag without `code`
+
 ## 1.4.0
 
 ### Minor Changes
