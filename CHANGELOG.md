@@ -1,5 +1,11 @@
 # turnish
 
+## 1.7.1
+
+### Patch Changes
+
+- Remove jsdom dependency from unit test
+
 ## 1.7.0
 
 ### Minor Changes
