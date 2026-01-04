@@ -1,5 +1,11 @@
 # turnish
 
+## 1.7.0
+
+### Minor Changes
+
+- use turnish-plugin-gfm
+
 ## 1.6.2
 
 ### Patch Changes
