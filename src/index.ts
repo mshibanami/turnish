@@ -8,7 +8,6 @@ import RootNode from '@/root-node';
 import { ExtendedNode, NodeTypes } from '@/node';
 export { NodeTypes } from '@/node';
 export type { ExtendedNode, NodeType } from '@/node';
-const reduce = Array.prototype.reduce
 
 type EscapeRule = [RegExp, string];
 
