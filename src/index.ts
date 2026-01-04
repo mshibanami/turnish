@@ -1,9 +1,10 @@
-import { defaultRules } from '@/default-rules'
-import { Rules, Rule, RuleFilter } from '@/rules'
-export { Rules } from '@/rules'
-export type { Rule, RuleFilter, RuleFilterFunction } from '@/rules'
-import { isCodeBlock, trimLeadingNewlines, trimTrailingNewlines } from '@/utilities'
-import RootNode from '@/root-node'
+import { defaultRules } from '@/default-rules';
+import { Rules, Rule, RuleFilter } from '@/rules';
+export { Rules } from '@/rules';
+export type { Rule, RuleFilter, RuleFilterFunction } from '@/rules';
+import { trimLeadingNewlines, trimTrailingNewlines } from '@/utilities';
+export { isCodeBlock } from '@/utilities';
+import RootNode from '@/root-node';
 import { ExtendedNode, NodeTypes } from '@/node';
 export { NodeTypes } from '@/node';
 export type { ExtendedNode, NodeType } from '@/node';
@@ -271,17 +272,6 @@ export default class Turnish {
       rule.replacement(content, node, this.options) +
       whitespace.trailing
     )
-  }
-
-  /**
-   * Determines whether a node is a code block
-   * @public
-   * @param {Node} node The node to check
-   * @returns True if the node is a code block, false otherwise
-   * @type boolean
-   */
-  isCodeBlock(node: Node): boolean {
-    return isCodeBlock(node);
   }
 }
 
