@@ -44,6 +44,10 @@ const config: UserConfigExport = defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    test: {
+        environment: 'jsdom',
+        include: ['test/**/*.test.ts'],
+    },
 });
 
 export default config;
