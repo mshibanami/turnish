@@ -1,5 +1,11 @@
 # turnish
 
+## 1.6.2
+
+### Patch Changes
+
+- Export isCodeBlock for turnish-plugin-gfm
+
 ## 1.6.1
 
 ### Patch Changes
