@@ -1,5 +1,11 @@
 # turnish
 
+## 1.6.1
+
+### Patch Changes
+
+- Export types
+
 ## 1.6.0
 
 ### Minor Changes
