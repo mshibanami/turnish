@@ -34,7 +34,7 @@ const config: UserConfigExport = defineConfig({
                 globals: {
                     '@mixmark-io/domino': 'domino'
                 },
-                exports: 'default',
+                exports: 'named',
             }
         },
     },
