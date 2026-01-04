@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import type { UserConfigExport } from 'vite';
 import path from 'path';

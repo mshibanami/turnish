@@ -1,13 +1,9 @@
 import Turnish from '../src';
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-import { Rule } from '@/rules';
-import { ExtendedNode } from '@/node';
-import { gfm } from '@joplin/turndown-plugin-gfm';
+import { gfm } from 'turnish-plugin-gfm';
 import { read } from './utilities';
 
-describe('@joplin/turndown-plugin-gfm', () => {
+describe('turnish-plugin-gfm', () => {
     it('converts strikethrough syntax', () => {
         const gfmTurnish = new Turnish();
         gfmTurnish.use(gfm);
