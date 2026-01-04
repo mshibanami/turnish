@@ -273,6 +273,13 @@ export default class Turnish {
     )
   }
 
+  /**
+   * Determines whether a node is a code block
+   * @public
+   * @param {Node} node The node to check
+   * @returns True if the node is a code block, false otherwise
+   * @type boolean
+   */
   isCodeBlock(node: Node): boolean {
     return isCodeBlock(node);
   }
