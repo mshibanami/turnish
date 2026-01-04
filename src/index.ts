@@ -1,8 +1,12 @@
 import { defaultRules } from '@/default-rules'
 import { Rules, Rule, RuleFilter } from '@/rules'
+export { Rules } from '@/rules'
+export type { Rule, RuleFilter, RuleFilterFunction } from '@/rules'
 import { isCodeBlock, trimLeadingNewlines, trimTrailingNewlines } from '@/utilities'
 import RootNode from '@/root-node'
 import { ExtendedNode, NodeTypes } from '@/node';
+export { NodeTypes } from '@/node';
+export type { ExtendedNode, NodeType } from '@/node';
 const reduce = Array.prototype.reduce
 
 type EscapeRule = [RegExp, string];
@@ -24,7 +28,7 @@ const escapes: EscapeRule[] = [
   [/^(\d+)\. /g, '$1\\. ']
 ];
 
-type Plugin = (service: Turnish) => void;
+export type Plugin = (service: Turnish) => void;
 
 export interface TurnishOptions {
   rules: { [key: string]: Rule };
