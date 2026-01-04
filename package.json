@@ -29,6 +29,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@adobe/css-tools": "^4.4.4",
     "@mixmark-io/domino": "^2.2.0"
   },
   "devDependencies": {

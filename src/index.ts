@@ -1,6 +1,6 @@
 import { defaultRules } from '@/default-rules'
 import { Rules, Rule, RuleFilter } from '@/rules'
-import { trimLeadingNewlines, trimTrailingNewlines } from '@/utilities'
+import { isCodeBlock, trimLeadingNewlines, trimTrailingNewlines } from '@/utilities'
 import RootNode from '@/root-node'
 import { ExtendedNode, NodeTypes } from '@/node';
 const reduce = Array.prototype.reduce
@@ -267,6 +267,10 @@ export default class Turnish {
       rule.replacement(content, node, this.options) +
       whitespace.trailing
     )
+  }
+
+  isCodeBlock(node: Node): boolean {
+    return isCodeBlock(node);
   }
 }
 

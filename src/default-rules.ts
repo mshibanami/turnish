@@ -1,7 +1,6 @@
-
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
-import { repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
+import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
@@ -284,10 +283,9 @@ defaultRules.strong = {
 
 defaultRules.code = {
   filter: (node: Node): boolean => {
-    const hasSiblings = node.previousSibling || node.nextSibling;
     const parent = node.parentNode as Element;
-    const isCodeBlock = parent.nodeName === 'PRE' && !hasSiblings;
-    return node.nodeName === 'CODE' && !isCodeBlock;
+    const isCodeBlockNode = isCodeBlock(parent);
+    return node.nodeName === 'CODE' && !isCodeBlockNode;
   },
   replacement: (content: string): string => {
     const trimmed = content.replace(/\r?\n|\r/g, ' ');

@@ -1,4 +1,5 @@
-import { ExtendedNode, NodeTypes } from "./node";
+import CSSTools from "@adobe/css-tools";
+import { NodeTypes } from "./node";
 
 export function repeat(character: string, count: number) {
   return Array(count + 1).join(character)
@@ -95,6 +96,74 @@ export function sanitizedLinkTitle(content: string): string {
   const sanitized = sanitizeWhitespace(content);
   return sanitized
     .replace(/[\t\r\n]+/g, ' ');
+}
+
+// To handle code that is presented as below (see https://github.com/laurent22/joplin/issues/573)
+//
+// <td class="code">
+//   <pre class="python">
+//     <span style="color: #ff7700;font-weight:bold;">def</span> ma_fonction
+//   </pre>
+// </td>
+export function isCodeBlockSpecialCase1(node: Node): boolean {
+  const parent = node.parentNode
+  if (!parent) {
+    return false;
+  }
+  return parent instanceof Element
+    && parent.classList
+    && parent.classList.contains('code')
+    && parent.nodeName === 'TD' && node.nodeName === 'PRE'
+}
+
+// To handle PRE tags that have a monospace font family. In that case
+// we assume it is a code block.
+export function isCodeBlockSpecialCase2(node: Node): boolean {
+  if (node.nodeName !== 'PRE') {
+    return false;
+  }
+  if (!(node instanceof Element)) {
+    return false;
+  }
+  const style = node.getAttribute('style');
+  if (!style) {
+    return false;
+  }
+  const o = CSSTools.parse('pre {' + style + '}');
+  if (!o.stylesheet.rules.length) {
+    return false;
+  }
+  const rule = o.stylesheet.rules[0];
+  // Check if 'declarations' exists on the rule before accessing it
+  if (!('declarations' in rule) || !rule.declarations) {
+    return false;
+  }
+  const fontFamily = rule.declarations.find(d => {
+    if (!('property' in d)) {
+      return false;
+    }
+    return d.property.toLowerCase() === 'font-family';
+  });
+  if (!fontFamily
+    || ('value' in fontFamily && !fontFamily.value)) {
+    return false;
+  }
+  const isMonospace = 'value' in fontFamily
+    && fontFamily.value.split(',').map(e => e.trim().toLowerCase()).indexOf('monospace') >= 0;
+  return isMonospace;
+}
+
+export function isCodeBlock(node: Node): boolean {
+  if (isCodeBlockSpecialCase1(node)
+    || isCodeBlockSpecialCase2(node)) {
+    return true
+  }
+
+  return (
+    node.nodeName === 'PRE' &&
+    node.firstChild &&
+    node.firstChild.nodeName === 'CODE'
+  ) || false;
 }
 
 export type RequireOnly<T, K extends keyof T> =
