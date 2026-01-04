@@ -110,9 +110,9 @@ export function isCodeBlockSpecialCase1(node: Node): boolean {
   if (!parent) {
     return false;
   }
-  return parent instanceof Element
-    && parent.classList
-    && parent.classList.contains('code')
+  return parent.nodeType === NodeTypes.Element
+    && (parent as Element).classList
+    && (parent as Element).classList.contains('code')
     && parent.nodeName === 'TD' && node.nodeName === 'PRE'
 }
 
@@ -122,10 +122,10 @@ export function isCodeBlockSpecialCase2(node: Node): boolean {
   if (node.nodeName !== 'PRE') {
     return false;
   }
-  if (!(node instanceof Element)) {
+  if (node.nodeType !== NodeTypes.Element) {
     return false;
   }
-  const style = node.getAttribute('style');
+  const style = (node as Element).getAttribute('style');
   if (!style) {
     return false;
   }

@@ -120,5 +120,4 @@ export const NodeTypes = {
   CDATASection: 4,
   Comment: 8
 } as const;
-
 export type NodeType = typeof NodeTypes[keyof typeof NodeTypes];
