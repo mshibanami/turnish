@@ -45,7 +45,6 @@ const config: UserConfigExport = defineConfig({
         },
     },
     test: {
-        environment: 'jsdom',
         include: ['test/**/*.test.ts'],
     },
 });
