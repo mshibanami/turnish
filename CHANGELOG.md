@@ -1,5 +1,11 @@
 # turnish
 
+## 1.6.0
+
+### Minor Changes
+
+- Add isCodeBlock() method to Turnish class for compatibility with Turndown
+
 ## 1.5.0
 
 ### Minor Changes
