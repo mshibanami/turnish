@@ -193,8 +193,7 @@ const referenceLinkRule: RequireOnly<Rule, "urlReferenceIdMap" | "references"> =
     );
   },
   replacement: function (content: string, node: Node, options: TurnishOptions): string {
-    const self = referenceLinkRule;
-
+    const self = this as RequireOnly<Rule, "urlReferenceIdMap" | "references">;
     const href = (node as Element).getAttribute('href');
     let title: string;
     const titleAttr = (node as Element).getAttribute('title');
@@ -249,8 +248,8 @@ const referenceLinkRule: RequireOnly<Rule, "urlReferenceIdMap" | "references"> =
   },
   references: [],
   urlReferenceIdMap: new Map<string, number>(),
-  append: (): string => {
-    const self = referenceLinkRule;
+  append: function (): string {
+    const self = this as RequireOnly<Rule, "urlReferenceIdMap" | "references">;
     let references = '';
     if (self.references && self.references.length) {
       references = '\n\n' + self.references.join('\n') + '\n\n';

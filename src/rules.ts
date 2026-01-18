@@ -48,7 +48,18 @@ export class Rules {
 
     this.array = [];
     for (const key in options.rules) {
-      this.array.push(options.rules[key]);
+      let rule = options.rules[key];
+      if (key === 'referenceLink') {
+        const cloned: Rule = {
+          ...rule,
+          references: [],
+          urlReferenceIdMap: new Map()
+        };
+        if (rule.replacement) cloned.replacement = (rule.replacement as Function).bind(cloned);
+        if (rule.append) cloned.append = (rule.append as Function).bind(cloned);
+        rule = cloned;
+      }
+      this.array.push(rule);
     }
   }
 
