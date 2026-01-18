@@ -4,6 +4,7 @@ import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTi
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
+const listNestingCache = new WeakMap<Node, number>();
 
 defaultRules.paragraph = {
   filter: 'p',
@@ -77,16 +78,20 @@ defaultRules.listItem = {
       return content + (node.nextSibling ? '\n' : '');
     }
 
-    let nestingLevel = 0;
-    let currentNode: Node | null = parent;
-    while (currentNode) {
-      if (currentNode.nodeName === 'UL' || currentNode.nodeName === 'OL') {
-        const grandparent = currentNode.parentNode as Element | null;
-        if (grandparent && grandparent.nodeName === 'LI') {
-          nestingLevel++;
+    const cachedNestingLevel = listNestingCache.get(node);
+    let nestingLevel = cachedNestingLevel ?? 0;
+    if (cachedNestingLevel === undefined) {
+      let currentNode: Node | null = parent;
+      while (currentNode) {
+        if (currentNode.nodeName === 'UL' || currentNode.nodeName === 'OL') {
+          const grandparent = currentNode.parentNode as Element | null;
+          if (grandparent && grandparent.nodeName === 'LI') {
+            nestingLevel++;
+          }
         }
+        currentNode = currentNode.parentNode;
       }
-      currentNode = currentNode.parentNode;
+      listNestingCache.set(node, nestingLevel);
     }
 
     let oneIndent = options.listItemIndent === 'tab' ? '\t' : ' '.repeat(options.listItemIndentSpaceCount);
