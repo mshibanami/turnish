@@ -98,6 +98,26 @@ export function sanitizedLinkTitle(content: string): string {
     .replace(/[\t\r\n]+/g, ' ');
 }
 
+const allowedLinkSchemes = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+
+export function sanitizeLinkDestination(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  const lower = trimmed.toLowerCase();
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+    return null;
+  }
+  if (lower.startsWith('#') || lower.startsWith('/') || lower.startsWith('./') || lower.startsWith('../') || lower.startsWith('//')) {
+    return trimmed;
+  }
+  const schemeMatch = lower.match(/^([a-z][a-z0-9+.-]*:)/);
+  if (schemeMatch && !allowedLinkSchemes.has(schemeMatch[1])) {
+    return null;
+  }
+  return trimmed;
+}
+
 // To handle code that is presented as below (see https://github.com/laurent22/joplin/issues/573)
 //
 // <td class="code">
