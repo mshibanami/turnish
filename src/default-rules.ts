@@ -4,6 +4,26 @@ import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTi
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
+const listNestingCache = new WeakMap<Node, number>();
+
+function getListNestingLevel(node: Node): number {
+  const cached = listNestingCache.get(node);
+  if (cached !== undefined) return cached;
+
+  let nestingLevel = 0;
+  let currentNode: Node | null = node.parentNode;
+  while (currentNode) {
+    if (currentNode.nodeName === 'UL' || currentNode.nodeName === 'OL') {
+      const grandparent = currentNode.parentNode as Element | null;
+      if (grandparent && grandparent.nodeName === 'LI') {
+        nestingLevel++;
+      }
+    }
+    currentNode = currentNode.parentNode;
+  }
+  listNestingCache.set(node, nestingLevel);
+  return nestingLevel;
+}
 
 defaultRules.paragraph = {
   filter: 'p',
@@ -77,17 +97,7 @@ defaultRules.listItem = {
       return content + (node.nextSibling ? '\n' : '');
     }
 
-    let nestingLevel = 0;
-    let currentNode: Node | null = parent;
-    while (currentNode) {
-      if (currentNode.nodeName === 'UL' || currentNode.nodeName === 'OL') {
-        const grandparent = currentNode.parentNode as Element | null;
-        if (grandparent && grandparent.nodeName === 'LI') {
-          nestingLevel++;
-        }
-      }
-      currentNode = currentNode.parentNode;
-    }
+    const nestingLevel = getListNestingLevel(node);
 
     let oneIndent = options.listItemIndent === 'tab' ? '\t' : ' '.repeat(options.listItemIndentSpaceCount);
     let indent = oneIndent.repeat(nestingLevel);
