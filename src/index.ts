@@ -28,6 +28,15 @@ const escapes: EscapeRule[] = [
   [/^(\d+)\. /g, '$1\\. ']
 ];
 
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/'/g, '&#39;');
+}
+
 export type Plugin = (service: Turnish) => void;
 
 export interface TurnishOptions {
@@ -87,7 +96,7 @@ const defaultOptions: TurnishOptions = {
       const attrs: string[] = [];
       for (let i = 0; i < node.attributes.length; i++) {
         const attr = node.attributes[i];
-        attrs.push(`${attr.name}="${attr.value}"`);
+        attrs.push(`${attr.name}="${escapeHtmlAttribute(attr.value)}"`);
       }
       attributes = ' ' + attrs.join(' ');
     }
