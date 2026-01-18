@@ -4,6 +4,7 @@
 import { ExtendedNode } from "./node";
 import { TurnishOptions } from "@/index";
 import { standardMarkdownElements } from "./utilities";
+import { createReferenceLinkRule, defaultRules } from "./default-rules";
 
 export type RuleFilterFunction = (node: ExtendedNode, options: TurnishOptions) => boolean;
 export type RuleFilter = string | string[] | RuleFilterFunction;
@@ -48,7 +49,11 @@ export class Rules {
 
     this.array = [];
     for (const key in options.rules) {
-      this.array.push(options.rules[key]);
+      let rule = options.rules[key];
+      if (key === 'referenceLink' && rule === defaultRules.referenceLink) {
+        rule = createReferenceLinkRule();
+      }
+      this.array.push(rule);
     }
   }
 
