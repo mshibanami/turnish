@@ -1,6 +1,6 @@
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
-import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
+import { isCodeBlock, repeat, RequireOnly, sanitizeLinkDestination, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
@@ -168,9 +168,10 @@ defaultRules.inlineLink = {
   },
   replacement: function (content: string, node: Node): string {
     const sanitizedContent = sanitizedLinkContent(content);
-    let href = (node as Element)
-      .getAttribute('href')
-      ?.replace(/([()])/g, '\\$1');
+    const rawHref = (node as Element).getAttribute('href');
+    const sanitizedHref = sanitizeLinkDestination(rawHref);
+    if (!sanitizedHref) return sanitizedContent;
+    let href = sanitizedHref.replace(/([()])/g, '\\$1');
     let title: string;
     const titleAttr = (node as Element).getAttribute('title');
     if (titleAttr) {
@@ -195,7 +196,10 @@ const referenceLinkRule: RequireOnly<Rule, "urlReferenceIdMap" | "references"> =
   replacement: function (content: string, node: Node, options: TurnishOptions): string {
     const self = referenceLinkRule;
 
-    const href = (node as Element).getAttribute('href');
+    const href = sanitizeLinkDestination((node as Element).getAttribute('href'));
+    if (!href) {
+      return content;
+    }
     let title: string;
     const titleAttr = (node as Element).getAttribute('title');
     if (titleAttr) {
@@ -302,7 +306,7 @@ defaultRules.image = {
   replacement: function (_content: string, node: Node): string {
     const altAttr = (node as Element).getAttribute('alt');
     const alt = altAttr ? sanitizedLinkTitle(altAttr) : '';
-    const src = (node as Element).getAttribute('src') || '';
+    const src = sanitizeLinkDestination((node as Element).getAttribute('src'));
     const titleAttr = (node as Element).getAttribute('title');
     const title = titleAttr ? sanitizedLinkTitle(titleAttr) : '';
     const titlePart = title ? ' "' + title + '"' : '';
