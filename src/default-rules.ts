@@ -304,7 +304,7 @@ defaultRules.image = {
     const alt = altAttr ? sanitizedLinkTitle(altAttr) : '';
     const src = (node as Element).getAttribute('src') || '';
     const titleAttr = (node as Element).getAttribute('title');
-    const title = titleAttr ? sanitizedLinkTitle(titleAttr) : '';
+    const title = titleAttr ? sanitizedLinkTitle(titleAttr).replace(/"/g, '\\"') : '';
     const titlePart = title ? ' "' + title + '"' : '';
     return src ? '![' + alt + ']' + '(' + src + titlePart + ')' : '';
   }
