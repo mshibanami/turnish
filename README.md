@@ -3,7 +3,7 @@
 [![Test](https://github.com/mshibanami/turnish/actions/workflows/test.yml/badge.svg)](https://github.com/mshibanami/turnish/actions/workflows/test.yml)
 [![NPM version](https://img.shields.io/npm/v/turnish.svg?style=flat)](https://www.npmjs.org/package/turnish)
 
-Turnish is a HTML to Markdown converter written in JavaScript.
+Turnish is a HTML to Markdown converter written in TypeScript.
 
 This is a fork of [Turndown](https://github.com/mixmark-io/turndown), originally created by Dom Christie.
 
@@ -87,31 +87,33 @@ Options can be passed in to the constructor on instantiation. For example:
 var turnish = new Turnish({ option: 'value' })
 ```
 
-| Option                       | Description                                                                                                                                                                                                                                                                                                                                 | Default    |
-| :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------- |
-| `headingStyle`               | Style of headings such as h1, h2...<br/>`setext`: underlined headings<br/>`atx`: hash-prefixed headings                                                                                                                                                                                                                                     | `atx`      |
-| `hr`                         | Any [Thematic break](http://spec.commonmark.org/0.27/#thematic-breaks)                                                                                                                                                                                                                                                                      | `---`      |
-| `bulletListMarker`           | `-`, `+`, or `*`                                                                                                                                                                                                                                                                                                                            | `-`        |
-| `listMarkerSpaceCount`       | Number of spaces after the bullet list marker.<br/><br/>`1` - `4`                                                                                                                                                                                                                                                                           | `1`        |
-| `listItemIndent`             | `tab` or `space`                                                                                                                                                                                                                                                                                                                            | `space`    |
-| `listItemIndentSpaceCount`   | Number of spaces for the nested list item indentation.<br/><br/>`1` - `4`                                                                                                                                                                                                                                                                   | `4`        |
-| `codeBlockStyle`             | `indented` or `fenced`                                                                                                                                                                                                                                                                                                                      | `fenced`   |
-| `fence`                      | ` ``` ` or `~~~`                                                                                                                                                                                                                                                                                                                            | ` ``` `    |
-| `emDelimiter`                | `_` or `*`                                                                                                                                                                                                                                                                                                                                  | `*`        |
-| `strongDelimiter`            | `**` or `__`                                                                                                                                                                                                                                                                                                                                | `**`       |
-| `linkStyle`                  | `inlined` or `referenced`                                                                                                                                                                                                                                                                                                                   | `inlined`  |
-| `linkReferenceStyle`         | `full`, `collapsed`, or `shortcut`                                                                                                                                                                                                                                                                                                          | `full`     |
-| `linkReferenceDeduplication` | How duplicate link reference definitions are handled.<br/><br/>`none`: preserve every duplicate reference as-is.<br/>`full`: merge identical references into one.                                                                                                                                                                           | `full`     |
-| `htmlRetentionMode`          | How non-standard HTML fragments are handled.<br/><br/>`standard`: does not preserve non-standard HTML<br/>`preserveAll`: preserve non-standard HTML tags and its children<br/>`markdownIncludingHtml`: preserve non-standard HTML while including Markdown as its child. `markdown="1"` attribute is added when the HTML contains Markdown. | `standard` |
-| `preformattedCode`           | Whether to preserve whitespace and newlines within `<code>` tags, treating them as preformatted content.                                                                                                                                                                                                                                    | `false`    |
+| Option                       | Description                                                                                                                                                                                                                                                                                                                                  | Default    |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- |
+| `headingStyle`               | Style of headings such as h1, h2...<br/>`setext`: underlined headings<br/>`atx`: hash-prefixed headings                                                                                                                                                                                                                                      | `atx`      |
+| `hr`                         | Any [Thematic break](http://spec.commonmark.org/0.27/#thematic-breaks)                                                                                                                                                                                                                                                                       | `---`      |
+| `bulletListMarker`           | `-`, `+`, or `*`                                                                                                                                                                                                                                                                                                                             | `-`        |
+| `listMarkerSpaceCount`       | Number of spaces after the bullet list marker.<br/><br/>`1` - `4`                                                                                                                                                                                                                                                                            | `1`        |
+| `listItemIndent`             | `tab` or `space`                                                                                                                                                                                                                                                                                                                             | `space`    |
+| `listItemIndentSpaceCount`   | Number of spaces for the nested list item indentation.<br/><br/>`2` or `4`                                                                                                                                                                                                                                                                   | `4`        |
+| `br`                         | The string used for line breaks.                                                                                                                                                                                                                                                                                                             | `  `       |
+| `codeBlockStyle`             | `indented` or `fenced`                                                                                                                                                                                                                                                                                                                       | `fenced`   |
+| `fence`                      | ` ``` ` or `~~~`                                                                                                                                                                                                                                                                                                                             | ` ``` `    |
+| `emDelimiter`                | `_` or `*`                                                                                                                                                                                                                                                                                                                                   | `*`        |
+| `strongDelimiter`            | `**` or `__`                                                                                                                                                                                                                                                                                                                                 | `**`       |
+| `linkStyle`                  | `inlined` or `referenced`                                                                                                                                                                                                                                                                                                                    | `inlined`  |
+| `linkReferenceStyle`         | `full`, `collapsed`, or `shortcut`                                                                                                                                                                                                                                                                                                           | `full`     |
+| `linkReferenceDeduplication` | How duplicate link reference definitions are handled.<br/><br/>`none`: preserve every duplicate reference as-is.<br/>`full`: merge identical references into one.                                                                                                                                                                            | `full`     |
+| `htmlRetentionMode`          | How non-standard HTML fragments are handled.<br/><br/>`standard`: does not preserve non-standard HTML<br/>`preserveAll`: preserve non-standard HTML tags and its children<br/>`markdownIncludingHtml`: preserve non-standard HTML while including Markdown as its child. `markdown="1"` attribute is always added when this mode is enabled. | `standard` |
+| `preformattedCode`           | Whether to preserve whitespace and newlines within `<code>` tags, treating them as preformatted content.                                                                                                                                                                                                                                     | `false`    |
 
 ### Advanced Options
 
-| Option               | Valid values              | Default                     |
-| :------------------- | :------------------------ | :-------------------------- |
-| `blankReplacement`   | rule replacement function | See **Special Rules** below |
-| `keepReplacement`    | rule replacement function | See **Special Rules** below |
-| `defaultReplacement` | rule replacement function | See **Special Rules** below |
+| Option                             | Valid values              | Default                     |
+| :--------------------------------- | :------------------------ | :-------------------------- |
+| `blankReplacement`                 | rule replacement function | See **Special Rules** below |
+| `keepReplacement`                  | rule replacement function | See **Special Rules** below |
+| `markdownIncludingHtmlReplacement` | rule replacement function | See **Special Rules** below |
+| `defaultReplacement`               | rule replacement function | See **Special Rules** below |
 
 ## Methods
 
@@ -238,24 +240,23 @@ rules.emphasis = {
 
 ### Special Rules
 
-**Blank rule** determines how to handle blank elements. It overrides every rule (even those added via `addRule`). A node is blank if it only contains whitespace, and it's not an `<a>`, `<td>`,`<th>` or a void element. Its behaviour can be customised using the `blankReplacement` option.
-
-**Keep rules** determine how to handle the elements that should not be converted, i.e. rendered as HTML in the Markdown output. By default, no elements are kept. Block-level elements will be separated from surrounding content by blank lines. Its behaviour can be customised using the `keepReplacement` option.
-
-**Remove rules** determine which elements to remove altogether. By default, no elements are removed.
-
-**Default rule** handles nodes which are not recognised by any other rule. By default, it outputs the node's text content (separated  by blank lines if it is a block-level element). Its behaviour can be customised with the `defaultReplacement` option.
+* **Blank rule** determines how to handle blank elements. It overrides every rule (even those added via `addRule`). A node is blank if it only contains whitespace, and it's not an `<a>`, `<td>`,`<th>` or a void element. Its behaviour can be customised using the `blankReplacement` option.
+* **Keep rules** determine how to handle the elements that are explicitly marked to be rendered as HTML via the `.keep()` method. By default, no elements are kept. Block-level elements will be separated from surrounding content by blank lines. Its behaviour can be customised using the `keepReplacement` option.
+* **Internal retention rules** determine how to handle elements when `htmlRetentionMode` is not `standard`. It automatically preserves non-standard HTML tags or tags with extra attributes. Its behaviour can be customised using the `keepReplacement` or `markdownIncludingHtmlReplacement` option.
+* **Remove rules** determine which elements to remove altogether. By default, no elements are removed.
+* **Default rule** handles nodes which are not recognised by any other rule. By default, it outputs the node's text content (separated  by blank lines if it is a block-level element). Its behaviour can be customised with the `defaultReplacement` option.
 
 ### Rule Precedence
 
 Turnish iterates over the set of rules, and picks the first one that matches the `filter`. The following list describes the order of precedence:
 
 1. Blank rule
-2. Added rules (optional)
-3. Commonmark rules
-4. Keep rules
-5. Remove rules
-6. Default rule
+2. Internal retention rules (if `htmlRetentionMode` is enabled)
+3. Added rules (optional)
+4. Commonmark rules
+5. Keep rules (via `.keep()`)
+6. Remove rules (via `.remove()`)
+7. Default rule
 
 ## Plugins
 
