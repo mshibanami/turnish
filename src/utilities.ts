@@ -80,6 +80,15 @@ function has(node: Node, tagNames: string[]) {
   )
 }
 
+export function sanitizedHtmlAttribute(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/'/g, '&#39;');
+}
+
 export function sanitizeWhitespace(string: string): string {
   return string ? string.replace(/(\n+\s*)+/g, '\n') : '';
 }
