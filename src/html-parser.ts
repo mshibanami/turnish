@@ -40,11 +40,11 @@ function createParser(): HTMLParser {
     // Browser environment: use DOM API
     class HTMLParserBrowser extends HTMLParser {
       parseFromString(input: string, _type?: string): Document {
-        const doc = document.implementation.createHTMLDocument('')
-        doc.open()
-        doc.write(input)
-        doc.close()
-        return doc
+        const doc = document.implementation.createHTMLDocument('');
+        const template = document.createElement('template');
+        template.innerHTML = input;
+        doc.body.appendChild(template.content);
+        return doc;
       }
     }
     return new HTMLParserBrowser()
