@@ -183,87 +183,84 @@ defaultRules.inlineLink = {
   }
 };
 
-export function createReferenceLinkRule(): RequireOnly<Rule, "urlReferenceIdMap" | "references"> {
-  const references: string[] = [];
-  let urlReferenceIdMap = new Map<string, number>();
-
-  return {
-    filter: function (node: Node, options: TurnishOptions): boolean {
-      return !!(
-        options &&
-        options.linkStyle === 'referenced' &&
-        node.nodeName === 'A' &&
-        (node as Element).getAttribute('href')
-      );
-    },
-    replacement: function (content: string, node: Node, options: TurnishOptions): string {
-      const href = (node as Element).getAttribute('href');
-      let title: string;
-      const titleAttr = (node as Element).getAttribute('title');
-      if (titleAttr) {
-        const sanitizedTitle = sanitizedLinkTitle(titleAttr);
-        title = ' "' + sanitizedTitle + '"';
-      } else {
-        title = '';
-      }
-      const referenceKey = href + title;
-
-      let replacement: string;
-      let reference: string;
-      switch (options.linkReferenceStyle) {
-        case 'collapsed':
-          replacement = '[' + content + '][]';
-          reference = '[' + content + ']: ' + referenceKey;
-          break;
-        case 'shortcut':
-          replacement = '[' + content + ']';
-          reference = '[' + content + ']: ' + referenceKey;
-          break;
-        default: {
-          let id: number;
-          const existingKey = urlReferenceIdMap.get(referenceKey);
-          if (options.linkReferenceDeduplication === 'full' && existingKey) {
-            id = existingKey;
-            reference = '[' + id + ']: ' + href + title;
-          } else {
-            id = references.length + 1;
-            urlReferenceIdMap.set(referenceKey, id);
-            reference = '[' + id + ']: ' + href + title;
-            references.push(reference);
-          }
-          replacement = '[' + content + '][' + id + ']';
-          break;
-        }
-      }
-
-      if (options.linkReferenceStyle !== 'full') {
-        // Check if we should deduplicate
-        if (options.linkReferenceDeduplication === 'full') {
-          if (!urlReferenceIdMap.has(referenceKey)) {
-            urlReferenceIdMap.set(referenceKey, 1);
-            references.push(reference);
-          }
-        } else {
-          references.push(reference);
-        }
-      }
-      return replacement;
-    },
-    references,
-    urlReferenceIdMap,
-    append: (): string => {
-      let referencesText = '';
-      if (references.length) {
-        referencesText = '\n\n' + references.join('\n') + '\n\n';
-        references.length = 0;
-        urlReferenceIdMap = new Map();
-      }
-      return referencesText;
+const referenceLinkRule: RequireOnly<Rule, "urlReferenceIdMap" | "references"> = {
+  filter: function (node: Node, options: TurnishOptions): boolean {
+    return !!(
+      options &&
+      options.linkStyle === 'referenced' &&
+      node.nodeName === 'A' &&
+      (node as Element).getAttribute('href')
+    );
+  },
+  replacement: function (content: string, node: Node, options: TurnishOptions): string {
+    const self = this as RequireOnly<Rule, "urlReferenceIdMap" | "references">;
+    const href = (node as Element).getAttribute('href');
+    let title: string;
+    const titleAttr = (node as Element).getAttribute('title');
+    if (titleAttr) {
+      const sanitizedTitle = sanitizedLinkTitle(titleAttr);
+      title = ' "' + sanitizedTitle + '"';
+    } else {
+      title = '';
     }
-  };
-}
+    const referenceKey = href + title;
 
-defaultRules.referenceLink = createReferenceLinkRule();
+    let replacement: string;
+    let reference: string;
+    switch (options.linkReferenceStyle) {
+      case 'collapsed':
+        replacement = '[' + content + '][]';
+        reference = '[' + content + ']: ' + referenceKey;
+        break;
+      case 'shortcut':
+        replacement = '[' + content + ']';
+        reference = '[' + content + ']: ' + referenceKey;
+        break;
+      default: {
+        let id: number;
+        const existingKey = self.urlReferenceIdMap.get(referenceKey);
+        if (options.linkReferenceDeduplication === 'full' && existingKey) {
+          id = existingKey;
+          reference = '[' + id + ']: ' + href + title;
+        } else {
+          id = self.references.length + 1;
+          self.urlReferenceIdMap.set(referenceKey, id);
+          reference = '[' + id + ']: ' + href + title;
+          self.references.push(reference);
+        }
+        replacement = '[' + content + '][' + id + ']';
+        break;
+      }
+    }
+
+    if (options.linkReferenceStyle !== 'full') {
+      // Check if we should deduplicate
+      if (options.linkReferenceDeduplication === 'full') {
+        if (!self.urlReferenceIdMap.has(referenceKey)) {
+          self.urlReferenceIdMap.set(referenceKey, 1);
+          self.references.push(reference);
+        }
+      } else {
+        self.references.push(reference);
+      }
+    }
+    return replacement;
+  },
+  references: [],
+  urlReferenceIdMap: new Map<string, number>(),
+  append: function (): string {
+    const self = this as RequireOnly<Rule, "urlReferenceIdMap" | "references">;
+    let references = '';
+    if (self.references && self.references.length) {
+      references = '\n\n' + self.references.join('\n') + '\n\n';
+      self.references = [];
+      self.urlReferenceIdMap = new Map();
+    }
+    return references;
+  }
+};
+
+defaultRules.referenceLink = referenceLinkRule;
 
 defaultRules.emphasis = {
   filter: ['em', 'i'],

@@ -4,7 +4,6 @@
 import { ExtendedNode } from "./node";
 import { TurnishOptions } from "@/index";
 import { standardMarkdownElements } from "./utilities";
-import { createReferenceLinkRule, defaultRules } from "./default-rules";
 
 export type RuleFilterFunction = (node: ExtendedNode, options: TurnishOptions) => boolean;
 export type RuleFilter = string | string[] | RuleFilterFunction;
@@ -50,8 +49,15 @@ export class Rules {
     this.array = [];
     for (const key in options.rules) {
       let rule = options.rules[key];
-      if (key === 'referenceLink' && rule === defaultRules.referenceLink) {
-        rule = createReferenceLinkRule();
+      if (key === 'referenceLink') {
+        const cloned: Rule = {
+          ...rule,
+          references: [],
+          urlReferenceIdMap: new Map()
+        };
+        if (rule.replacement) cloned.replacement = (rule.replacement as Function).bind(cloned);
+        if (rule.append) cloned.append = (rule.append as Function).bind(cloned);
+        rule = cloned;
       }
       this.array.push(rule);
     }
