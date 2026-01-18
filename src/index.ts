@@ -2,7 +2,7 @@ import { defaultRules } from '@/default-rules';
 import { Rules, Rule, RuleFilter } from '@/rules';
 export { Rules } from '@/rules';
 export type { Rule, RuleFilter, RuleFilterFunction } from '@/rules';
-import { trimLeadingNewlines, trimTrailingNewlines } from '@/utilities';
+import { sanitizedHtmlAttribute, trimLeadingNewlines, trimTrailingNewlines } from '@/utilities';
 export { isCodeBlock } from '@/utilities';
 import RootNode from '@/root-node';
 import { ExtendedNode, NodeTypes } from '@/node';
@@ -87,7 +87,7 @@ const defaultOptions: TurnishOptions = {
       const attrs: string[] = [];
       for (let i = 0; i < node.attributes.length; i++) {
         const attr = node.attributes[i];
-        attrs.push(`${attr.name}="${attr.value}"`);
+        attrs.push(`${attr.name}="${sanitizedHtmlAttribute(attr.value)}"`);
       }
       attributes = ' ' + attrs.join(' ');
     }
