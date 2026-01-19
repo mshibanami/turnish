@@ -1,5 +1,23 @@
 # turnish
 
+## 1.8.0
+
+### Minor Changes
+
+- Minor bug fixes and documentation update
+
+  ## Bug fixes
+
+  - Escape HTML attribute values in retained HTML ([#2](https://github.com/mshibanami/turnish/pull/2))
+  - Avoid array allocations in process ([#7](https://github.com/mshibanami/turnish/pull/7))
+  - Avoid document.write when parsing HTML ([#4](https://github.com/mshibanami/turnish/pull/4))
+
+  Thanks to [@Olyno](https://github.com/Olyno) for reporting and fixing all of the above issues!
+
+  ## Documentation
+
+  - Updated README
+
 ## 1.7.1
 
 ### Patch Changes
