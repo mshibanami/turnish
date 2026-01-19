@@ -213,7 +213,10 @@ export default class Turnish {
    * @type string
    */
   process(this: Turnish, parentNode: Node): string {
-    return Array.from(parentNode.childNodes).reduce((output, node) => {
+    let output = '';
+    const children = parentNode.childNodes;
+    for (let i = 0; i < children.length; i++) {
+      const node = children[i];
       const extended = ExtendedNode(node, this.options);
       let replacement = '';
       if (extended.nodeType === NodeTypes.Text) {
@@ -229,8 +232,9 @@ export default class Turnish {
       } else if (extended.nodeType === NodeTypes.Element) {
         replacement = this.replacementForNode(extended);
       }
-      return join(output, replacement);
-    }, '');
+      output = join(output, replacement);
+    }
+    return output;
   }
 
   /**
