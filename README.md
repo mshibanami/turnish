@@ -33,6 +33,10 @@ Turnish has been created to address various issues found in Turndown, while keep
 * Modernized build system using Vite
 * Improved code structure for better maintainability
 
+> [!WARNING]
+>
+> Same as Turndown, Turnish doesn't aim to sanitize or validate untrusted HTML inputs. Please use Turnish with a dedicated HTML sanitizer if the input HTML is untrusted. Check the [FAQ](./#FAQ) for more details.
+
 ## Installation
 
 npm:
@@ -273,6 +277,22 @@ To avoid the complexity and the performance implications of parsing the content 
 If you are confident in doing so, you may want to customise the escaping behaviour to suit your needs. This can be done by overriding the `escape()` method of `Turnish`. `escape()` takes the text of each HTML element and should return a version with the Markdown characters escaped.
 
 Note: text in code elements is never passed to`escape()`.
+
+## FAQ
+
+### Does Turnish have full [XSS](https://en.wikipedia.org/wiki/Cross-site_scripting) protection?
+
+No. [Like Turndown](https://github.com/mixmark-io/turndown/blob/master/SECURITY.md), Turnish focuses on converting HTML to Markdown and it doesn't aim to sanitize or validate untrusted HTML inputs. We may have some very basic protections against XSS attacks, but they are not comprehensive. Please don't rely on Turnish alone for XSS protection.
+
+If you need to handle untrusted HTML, consider using a dedicated HTML sanitizer library before passing the content to Turnish, such as:
+
+* [bleach](https://github.com/mozilla/bleach)
+* [DOMPurify](https://github.com/cure53/DOMPurify)
+* [sanitize-html](https://github.com/apostrophecms/sanitize-html)
+* [xss](https://github.com/leizongmin/js-xss)
+* etc.
+
+(Sorted alphabetically.)
 
 ## License
 
