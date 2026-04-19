@@ -1,5 +1,12 @@
 # turnish
 
+## 1.10.0
+
+### Minor Changes
+
+- Support white-space CSS property to preserve new lines and whitespaces
+- Simplify package exports by removing redundant `node` and `default` fields
+
 ## 1.9.0
 
 ### Minor Changes
