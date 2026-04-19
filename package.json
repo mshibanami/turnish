@@ -24,9 +24,7 @@
       "types": "./dist/types/index.d.ts",
       "browser": "./dist/index.mjs",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "node": "./dist/index.cjs",
-      "default": "./dist/index.mjs"
+      "require": "./dist/index.cjs"
     },
     "./package.json": "./package.json"
   },
