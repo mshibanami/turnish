@@ -20,7 +20,7 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "browser": "./dist/index.umd.js",
+      "browser": "./dist/index.mjs",
       "node": "./dist/index.cjs",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
