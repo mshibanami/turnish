@@ -1,6 +1,6 @@
 import collapseWhitespace from '@/collapse-whitespace'
 import { createHTMLParser, HTMLParser } from '@/html-parser'
-import { isBlock, isVoid } from '@/utilities'
+import { isBlock, isVoid, isWhitespacePreserved } from '@/utilities'
 
 interface RootNodeOptions {
   preformattedCode?: boolean
@@ -39,5 +39,5 @@ function htmlParser(): HTMLParser {
 }
 
 function isPreOrCode(node: Node): boolean {
-  return node.nodeName === 'PRE' || node.nodeName === 'CODE';
+  return isWhitespacePreserved(node) || node.nodeName === 'CODE';
 }

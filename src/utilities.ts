@@ -175,5 +175,34 @@ export function isCodeBlock(node: Node): boolean {
   ) || false;
 }
 
+export function isWhitespacePreserved(node: Node): boolean {
+  if (node.nodeName === 'PRE') {
+    return true;
+  }
+  if (node.nodeType !== NodeTypes.Element) {
+    return false;
+  }
+  const style = (node as Element).getAttribute('style');
+  if (!style) {
+    return false;
+  }
+  const o = CSSTools.parse('x {' + style + '}');
+  if (!o.stylesheet.rules.length) {
+    return false;
+  }
+  const rule = o.stylesheet.rules[0];
+  if (!('declarations' in rule) || !rule.declarations) {
+    return false;
+  }
+  const wsDecl = rule.declarations.find(
+    d => 'property' in d && d.property.toLowerCase() === 'white-space'
+  );
+  if (!wsDecl || !('value' in wsDecl) || !wsDecl.value) {
+    return false;
+  }
+  const value = wsDecl.value.replace(/\s*!important\s*$/, '').trim().toLowerCase();
+  return ['pre', 'pre-wrap', 'pre-line', 'break-spaces'].includes(value);
+}
+
 export type RequireOnly<T, K extends keyof T> =
   T & Required<Pick<T, K>>;

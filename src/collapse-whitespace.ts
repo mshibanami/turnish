@@ -26,6 +26,7 @@
  */
 
 import { NodeTypes } from "./node";
+import { isWhitespacePreserved } from "./utilities";
 
 /**
  * collapseWhitespace(options) removes extraneous whitespace from an the given element.
@@ -43,9 +44,7 @@ function collapseWhitespace(options: CollapseWhitespaceOptions): void {
   const element = options.element
   const isBlock = options.isBlock
   const isVoid = options.isVoid
-  const isPre = options.isPre || function (node: Node): boolean {
-    return node.nodeName === 'PRE';
-  };
+  const isPre = options.isPre || isWhitespacePreserved;
 
   if (!element.firstChild || isPre(element)) return
 
