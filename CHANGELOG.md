@@ -1,5 +1,15 @@
 # turnish
 
+## 1.9.0
+
+### Minor Changes
+
+- af15839: Improve package exports for better bundler and Node.js compatibility
+
+  - Point "browser" export condition to ESM instead of UMD to fix compatibility with modern bundlers like Vite
+  - Reorder exports conditions for better Node.js interop
+  - Add unpkg and jsdelivr fields for CDN support
+
 ## 1.8.0
 
 ### Minor Changes
