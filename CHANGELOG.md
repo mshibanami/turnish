@@ -11,29 +11,27 @@
 
 ### Minor Changes
 
-- af15839: Improve package exports for better bundler and Node.js compatibility
+- Improve package exports for better bundler and Node.js compatibility
 
-  - Point "browser" export condition to ESM instead of UMD to fix compatibility with modern bundlers like Vite
-  - Reorder exports conditions for better Node.js interop
-  - Add unpkg and jsdelivr fields for CDN support
+- Point "browser" export condition to ESM instead of UMD to fix compatibility with modern bundlers like Vite
+- Reorder exports conditions for better Node.js interop
+- Add unpkg and jsdelivr fields for CDN support
 
 ## 1.8.0
 
 ### Minor Changes
 
-- Minor bug fixes and documentation update
+## Bug fixes
 
-  ## Bug fixes
+- Escape HTML attribute values in retained HTML ([#2](https://github.com/mshibanami/turnish/pull/2))
+- Avoid array allocations in process ([#7](https://github.com/mshibanami/turnish/pull/7))
+- Avoid document.write when parsing HTML ([#4](https://github.com/mshibanami/turnish/pull/4))
 
-  - Escape HTML attribute values in retained HTML ([#2](https://github.com/mshibanami/turnish/pull/2))
-  - Avoid array allocations in process ([#7](https://github.com/mshibanami/turnish/pull/7))
-  - Avoid document.write when parsing HTML ([#4](https://github.com/mshibanami/turnish/pull/4))
+Thanks to [@Olyno](https://github.com/Olyno) for reporting and fixing all of the above issues!
 
-  Thanks to [@Olyno](https://github.com/Olyno) for reporting and fixing all of the above issues!
+## Documentation
 
-  ## Documentation
-
-  - Updated README
+- Updated README
 
 ## 1.7.1
 
@@ -87,7 +85,7 @@
 
 ### Minor Changes
 
-- [`a606e87`](https://github.com/mshibanami/turnish/commit/a606e871729efebbf3dcda7bbf8fc948eb3a3aed) Thanks [@mshibanami](https://github.com/mshibanami)! - Fixed extra spacing caused by GFM plugin
+- Fixed extra spacing caused by GFM plugin
 
 ## 1.1.0
 
