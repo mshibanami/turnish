@@ -3,6 +3,8 @@
   "description": "HTML to Markdown converter",
   "version": "1.8.0",
   "type": "module",
+  "unpkg": "./dist/index.umd.js",
+  "jsdelivr": "./dist/index.umd.js",
   "author": "Manabu Nakazawa",
   "publishConfig": {
     "access": "public"
