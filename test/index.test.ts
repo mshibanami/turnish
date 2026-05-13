@@ -1274,4 +1274,60 @@ describe('Turnish', () => {
         const input = '<a href="https://example.com"><img src="https://placehold.co/600x400/EEE/31343C" alt="Placeholder Image" /></a>';
         expect(turnish.render(input)).toBe('[![Placeholder Image](https://placehold.co/600x400/EEE/31343C)](https://example.com)');
     });
+
+    describe('CSS display awareness', () => {
+        it('flex row children are inline', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:flex;flex-flow:row;"><div>A</div><div>B</div></div>';
+            expect(turnish.render(input)).toBe('AB');
+        });
+
+        it('flex column children are block', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:flex;flex-direction:column;"><div>A</div><div>B</div></div>';
+            expect(turnish.render(input)).toBe('A\n\nB');
+        });
+
+        it('flex row with default direction (display:flex without direction)', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:flex;"><div>A</div><div>B</div></div>';
+            expect(turnish.render(input)).toBe('AB');
+        });
+
+        it('inline-flex children are inline', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:inline-flex;"><div>A</div><div>B</div></div>';
+            expect(turnish.render(input)).toBe('AB');
+        });
+
+        it('display:inline div is treated as inline', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:inline;">inline div</div> text';
+            expect(turnish.render(input)).toBe('inline div text');
+        });
+
+        it('display:block span is treated as block', () => {
+            const turnish = new Turnish();
+            const input = '<span style="display:block;">A</span><span style="display:block;">B</span>';
+            expect(turnish.render(input)).toBe('A\n\nB');
+        });
+
+        it('display:contents is transparent for flex parent lookup', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:flex;flex-flow:row;"><x-wrap style="display:contents;"><div>A</div></x-wrap><div>B</div></div>';
+            expect(turnish.render(input)).toBe('AB');
+        });
+
+        it('no style attribute is unchanged (tag-name-based)', () => {
+            const turnish = new Turnish();
+            const input = '<div>A div</div><div>Another div</div>';
+            expect(turnish.render(input)).toBe('A div\n\nAnother div');
+        });
+
+        it('reddit-like comment header in flex row renders inline', () => {
+            const turnish = new Turnish();
+            const input = '<div style="display:flex;flex-flow:row;"><div style="display:flex;"><a href="/user/test/">TestUser</a></div><span>•</span><a href="/comment/1/"><time>4mo ago</time></a></div>';
+            expect(turnish.render(input)).toBe('[TestUser](/user/test/)•[4mo ago](/comment/1/)');
+        });
+    });
 });

@@ -29,7 +29,102 @@ export const blockElements = [
   'TFOOT', 'TH', 'THEAD', 'TR', 'UL'
 ]
 
-export function isBlock(node: Node) {
+function getInlineStyleProperty(node: Node, property: string): string | null {
+  if (node.nodeType !== NodeTypes.Element) {
+    return null;
+  }
+  const style = (node as Element).getAttribute('style');
+  if (!style) {
+    return null;
+  }
+  const o = CSSTools.parse('x {' + style + '}');
+  if (!o.stylesheet.rules.length) {
+    return null;
+  }
+  const rule = o.stylesheet.rules[0];
+  if (!('declarations' in rule) || !rule.declarations) {
+    return null;
+  }
+  const decl = rule.declarations.find(
+    d => 'property' in d && d.property.toLowerCase() === property
+  );
+  if (!decl || !('value' in decl) || !decl.value) {
+    return null;
+  }
+  return decl.value.replace(/\s*!important\s*$/, '').trim().toLowerCase();
+}
+
+const inlineDisplayValues = new Set([
+  'inline', 'inline-block', 'inline-flex', 'inline-grid', 'contents', 'none',
+]);
+
+const blockDisplayValues = new Set([
+  'block', 'flex', 'grid', 'table', 'list-item', 'flow-root',
+]);
+
+function getFlexDirection(element: Element): string {
+  const flexDirection = getInlineStyleProperty(element, 'flex-direction');
+  if (flexDirection) return flexDirection;
+
+  const flexFlow = getInlineStyleProperty(element, 'flex-flow');
+  if (flexFlow) {
+    const parts = flexFlow.split(/\s+/);
+    const directionValues = ['row', 'row-reverse', 'column', 'column-reverse'];
+    for (const part of parts) {
+      if (directionValues.includes(part)) return part;
+    }
+  }
+
+  return 'row';
+}
+
+function getLayoutParent(node: Node): Element | null {
+  let parent = node.parentNode;
+  while (parent) {
+    if (parent.nodeType !== NodeTypes.Element) {
+      parent = parent.parentNode;
+      continue;
+    }
+    const parentDisplay = getInlineStyleProperty(parent, 'display');
+    if (parentDisplay !== 'contents') {
+      return parent as Element;
+    }
+    parent = parent.parentNode;
+  }
+  return null;
+}
+
+function isFlexRowItem(element: Element): boolean {
+  const parent = getLayoutParent(element);
+  if (!parent) return false;
+
+  const parentDisplay = getInlineStyleProperty(parent, 'display');
+  if (parentDisplay !== 'flex' && parentDisplay !== 'inline-flex') {
+    return false;
+  }
+
+  const direction = getFlexDirection(parent);
+  return direction === 'row' || direction === 'row-reverse';
+}
+
+export function isBlock(node: Node): boolean {
+  if (node.nodeType === NodeTypes.Element) {
+    const element = node as Element;
+
+    const display = getInlineStyleProperty(element, 'display');
+    if (display && inlineDisplayValues.has(display)) {
+      return false;
+    }
+
+    if (isFlexRowItem(element)) {
+      return false;
+    }
+
+    if (display && blockDisplayValues.has(display)) {
+      return true;
+    }
+  }
+
   return is(node, blockElements)
 }
 
@@ -179,28 +274,10 @@ export function isWhitespacePreserved(node: Node): boolean {
   if (node.nodeName === 'PRE') {
     return true;
   }
-  if (node.nodeType !== NodeTypes.Element) {
+  const value = getInlineStyleProperty(node, 'white-space');
+  if (!value) {
     return false;
   }
-  const style = (node as Element).getAttribute('style');
-  if (!style) {
-    return false;
-  }
-  const o = CSSTools.parse('x {' + style + '}');
-  if (!o.stylesheet.rules.length) {
-    return false;
-  }
-  const rule = o.stylesheet.rules[0];
-  if (!('declarations' in rule) || !rule.declarations) {
-    return false;
-  }
-  const wsDecl = rule.declarations.find(
-    d => 'property' in d && d.property.toLowerCase() === 'white-space'
-  );
-  if (!wsDecl || !('value' in wsDecl) || !wsDecl.value) {
-    return false;
-  }
-  const value = wsDecl.value.replace(/\s*!important\s*$/, '').trim().toLowerCase();
   return ['pre', 'pre-wrap', 'pre-line', 'break-spaces'].includes(value);
 }
 
