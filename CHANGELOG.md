@@ -1,5 +1,11 @@
 # turnish
 
+## 1.11.0
+
+### Minor Changes
+
+- e47f5ff: Improve inline/block node detection
+
 ## 1.10.0
 
 ### Minor Changes
