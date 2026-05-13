@@ -26,7 +26,7 @@ export const blockElements = [
   'FOOTER', 'FORM', 'FRAMESET', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEADER',
   'HGROUP', 'HR', 'HTML', 'ISINDEX', 'LI', 'MAIN', 'MENU', 'NAV', 'NOFRAMES',
   'NOSCRIPT', 'OL', 'OUTPUT', 'P', 'PRE', 'SECTION', 'TABLE', 'TBODY', 'TD',
-  'TFOOT', 'TH', 'THEAD', 'TR', 'UL'
+  'TFOOT', 'TH', 'THEAD', 'TR', 'UL', 'X-TURNISH'
 ]
 
 function getInlineStyleProperty(node: Node, property: string): string | null {
@@ -94,17 +94,20 @@ function getLayoutParent(node: Node): Element | null {
   return null;
 }
 
-function isFlexRowItem(element: Element): boolean {
+function isRowItem(element: Element): boolean {
   const parent = getLayoutParent(element);
   if (!parent) return false;
 
   const parentDisplay = getInlineStyleProperty(parent, 'display');
-  if (parentDisplay !== 'flex' && parentDisplay !== 'inline-flex') {
-    return false;
+
+  if (parentDisplay === 'flex' || parentDisplay === 'inline-flex') {
+    const direction = getFlexDirection(parent);
+    if (direction === 'row' || direction === 'row-reverse') {
+      return true;
+    }
   }
 
-  const direction = getFlexDirection(parent);
-  return direction === 'row' || direction === 'row-reverse';
+  return false;
 }
 
 export function isBlock(node: Node): boolean {
@@ -116,7 +119,12 @@ export function isBlock(node: Node): boolean {
       return false;
     }
 
-    if (isFlexRowItem(element)) {
+    if (isRowItem(element)) {
+      return false;
+    }
+
+    const parent = getLayoutParent(element);
+    if (parent && !isBlock(parent)) {
       return false;
     }
 

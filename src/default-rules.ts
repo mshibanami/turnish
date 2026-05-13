@@ -6,7 +6,9 @@ import { NodeTypes } from './node';
 export const defaultRules: { [key: string]: Rule } = {}
 
 defaultRules.paragraph = {
-  filter: 'p',
+  filter: function (node: any): boolean {
+    return node.nodeName === 'P' && node.isBlock;
+  },
   replacement: function (content: string): string {
     return '\n\n' + content + '\n\n';
   }
@@ -20,7 +22,9 @@ defaultRules.lineBreak = {
 };
 
 defaultRules.heading = {
-  filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  filter: function (node: any): boolean {
+    return ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(node.nodeName) && node.isBlock;
+  },
   replacement: function (content: string, node: Node, options: TurnishOptions): string {
     const hLevel = Number(node.nodeName.charAt(1));
     if (options.headingStyle === 'setext' && hLevel < 3) {
@@ -35,7 +39,9 @@ defaultRules.heading = {
 };
 
 defaultRules.blockquote = {
-  filter: 'blockquote',
+  filter: function (node: any): boolean {
+    return node.nodeName === 'BLOCKQUOTE' && node.isBlock;
+  },
   replacement: function (content: string): string {
     content = trimNewlines(content).replace(/^/gm, '> ');
     return '\n\n' + content + '\n\n';
@@ -43,7 +49,9 @@ defaultRules.blockquote = {
 };
 
 defaultRules.list = {
-  filter: ['ul', 'ol'],
+  filter: function (node: any): boolean {
+    return ['UL', 'OL'].includes(node.nodeName) && node.isBlock;
+  },
   replacement: function (content: string, node: Node): string {
     const parent = node.parentNode as Element;
     if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
@@ -55,7 +63,9 @@ defaultRules.list = {
 };
 
 defaultRules.listItem = {
-  filter: 'li',
+  filter: function (node: any): boolean {
+    return node.nodeName === 'LI' && node.isBlock;
+  },
   replacement: function (content: string, node: Node, options: TurnishOptions): string {
     let prefix = options.bulletListMarker + ' '.repeat(options.listMarkerSpaceCount);
     const parent = node.parentNode as Element;
