@@ -1,5 +1,11 @@
 # turnish
 
+## 1.11.1
+
+### Patch Changes
+
+- 48ddcb5: Align Markdown output with browser visual rendering for inline elements
+
 ## 1.11.0
 
 ### Minor Changes
