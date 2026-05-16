@@ -32,6 +32,11 @@ jobs:
           node-version: 22
           cache: "pnpm"
 
+      - name: Upgrade npm (for OIDC)
+        run: |
+          corepack enable
+          corepack prepare npm@latest --activate
+
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
