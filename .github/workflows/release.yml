@@ -26,14 +26,11 @@ jobs:
         with:
           version: 10
 
-      - name: Setup Node.js 24
+      - name: Setup Node.js 22
         uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version: 22
           cache: "pnpm"
-
-      - name: Upgrade npm (for OIDC)
-        run: npm install -g npm@latest
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
