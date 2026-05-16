@@ -1,5 +1,15 @@
 # turnish
 
+## 1.12.0
+
+### Minor Changes
+
+- 2e91992: Compact paragraph rendering if it's more natural
+
+### Patch Changes
+
+- 9914f42: Update dependencies
+
 ## 1.11.1
 
 ### Patch Changes
