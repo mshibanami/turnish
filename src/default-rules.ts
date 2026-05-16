@@ -1,6 +1,6 @@
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
-import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
+import { isBlock, isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
@@ -74,8 +74,22 @@ defaultRules.listItem = {
       const index = Array.prototype.indexOf.call(parent.children, node);
       prefix = (start ? Number(start) + index : index + 1) + '.' + ' '.repeat(options.listMarkerSpaceCount);
     }
+    const nonWhitespaceTextNodes = Array.from(node.childNodes).filter((child: Node) =>
+      child.nodeType === NodeTypes.Text && !/^\s*$/.test(child.nodeValue || '')
+    );
+    const elementChildren = Array.from((node as Element).children);
+    const hasSingleBlockElementChild = elementChildren.length === 1 &&
+      !['UL', 'OL'].includes(elementChildren[0].nodeName) &&
+      isBlock(elementChildren[0]);
+
+    const hasMultipleBlockSegments = /\n\s*\n/.test(trimNewlines(content));
+    const shouldCompactSingleBlockChild =
+      hasSingleBlockElementChild &&
+      nonWhitespaceTextNodes.length === 0 &&
+      !hasMultipleBlockSegments;
+
     const isParagraph = /\n$/.test(content);
-    content = trimNewlines(content) + (isParagraph ? '\n' : '');
+    content = trimNewlines(content) + (isParagraph && !shouldCompactSingleBlockChild ? '\n' : '');
 
     const hasOnlyNestedList = node.childNodes.length > 0 &&
       Array.from(node.childNodes).every((child: Node) => {

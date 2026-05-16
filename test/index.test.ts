@@ -539,7 +539,55 @@ describe('Turnish', () => {
     it('ul with paragraph', () => {
         const turnish = new Turnish();
         const input = "<ul>\n      <li><p>List item with paragraph</p></li>\n      <li>List item without paragraph</li>\n    </ul>";
-        expect(turnish.render(input)).toBe("- List item with paragraph\n    \n- List item without paragraph");
+        expect(turnish.render(input)).toBe("- List item with paragraph\n- List item without paragraph");
+    });
+
+    it('ul with single paragraph items does not add blank lines', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li>\n        <p>Item 1</p>\n      </li>\n      <li>\n        <p>Item 2</p>\n      </li>\n    </ul>";
+        expect(turnish.render(input)).toBe("- Item 1\n- Item 2");
+    });
+
+    it('ul with single div items does not add blank lines', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li><div>Item 1</div></li>\n      <li><div>Item 2</div></li>\n    </ul>";
+        expect(turnish.render(input)).toBe("- Item 1\n- Item 2");
+    });
+
+    it('ul with single blockquote items does not add blank lines between list items', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li><blockquote><p>Quote 1</p></blockquote></li>\n      <li><blockquote><p>Quote 2</p></blockquote></li>\n    </ul>";
+        expect(turnish.render(input)).toBe("- > Quote 1\n- > Quote 2");
+    });
+
+    it('ol with single heading items does not add blank lines', () => {
+        const turnish = new Turnish();
+        const input = "<ol>\n      <li><h3>Heading 1</h3></li>\n      <li><h3>Heading 2</h3></li>\n    </ol>";
+        expect(turnish.render(input)).toBe("1. ### Heading 1\n2. ### Heading 2");
+    });
+
+    it('does not compact when list item has non-whitespace text sibling', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li>Intro <p>Paragraph</p></li>\n      <li><p>Next</p></li>\n    </ul>";
+        expect(turnish.render(input)).toBe("- Intro\n    \n    Paragraph\n    \n- Next");
+    });
+
+    it('does not compact when list item has only nested list', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li>\n        <ul>\n          <li>Nested 1</li>\n          <li>Nested 2</li>\n        </ul>\n      </li>\n      <li><p>Tail</p></li>\n    </ul>";
+        expect(turnish.render(input)).toBe("    - Nested 1\n    - Nested 2\n- Tail");
+    });
+
+    it('does not compact multi-paragraph div list item', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li><div><p>A</p><p>B</p></div></li>\n      <li><div>C</div></li>\n    </ul>";
+        expect(turnish.render(input)).toBe("- A\n    \n    B\n    \n- C");
+    });
+
+    it('keeps paragraph separation for multi-paragraph list item', () => {
+        const turnish = new Turnish();
+        const input = "<ul>\n      <li>\n        <p>First paragraph</p>\n        <p>Second paragraph</p>\n      </li>\n      <li>\n        <p>Single paragraph</p>\n      </li>\n    </ul>";
+        expect(turnish.render(input)).toBe("- First paragraph\n    \n    Second paragraph\n    \n- Single paragraph");
     });
 
     it('ol with paragraphs', () => {
