@@ -1,5 +1,11 @@
 # turnish
 
+## 1.12.1
+
+### Patch Changes
+
+- 4df21e0: Improve compact paragraph rendering in list items with nested structures
+
 ## 1.12.0
 
 ### Minor Changes
