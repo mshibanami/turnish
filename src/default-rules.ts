@@ -78,18 +78,46 @@ defaultRules.listItem = {
       child.nodeType === NodeTypes.Text && !/^\s*$/.test(child.nodeValue || '')
     );
     const elementChildren = Array.from((node as Element).children);
-    const hasSingleBlockElementChild = elementChildren.length === 1 &&
-      !['UL', 'OL'].includes(elementChildren[0].nodeName) &&
-      isBlock(elementChildren[0]);
+    const nonListElementChildren = elementChildren.filter(child => !['UL', 'OL'].includes(child.nodeName));
+    const hasSingleBlockElementChild = nonListElementChildren.length === 1 &&
+      isBlock(nonListElementChildren[0]);
 
-    const hasMultipleBlockSegments = /\n\s*\n/.test(trimNewlines(content));
+    let wrapperHasMultipleSegments = false;
+    if (hasSingleBlockElementChild) {
+      let current = nonListElementChildren[0];
+      while (current) {
+        const children = Array.from(current.children);
+        const blocks = children.filter(child => isBlock(child));
+        if (blocks.length > 1) {
+          wrapperHasMultipleSegments = true;
+          break;
+        }
+        if (blocks.length === 0) {
+          break;
+        }
+        const hasSignificantText = Array.from(current.childNodes).some(n =>
+          n.nodeType === NodeTypes.Text && n.parentNode === current && !/^\s*$/.test(n.nodeValue || '')
+        );
+        if (hasSignificantText) {
+          wrapperHasMultipleSegments = true;
+          break;
+        }
+        current = blocks[0];
+      }
+    }
+
     const shouldCompactSingleBlockChild =
       hasSingleBlockElementChild &&
       nonWhitespaceTextNodes.length === 0 &&
-      !hasMultipleBlockSegments;
+      !wrapperHasMultipleSegments;
 
     const isParagraph = /\n$/.test(content);
-    content = trimNewlines(content) + (isParagraph && !shouldCompactSingleBlockChild ? '\n' : '');
+    content = trimNewlines(content);
+    if (isParagraph && !shouldCompactSingleBlockChild) {
+      content += '\n';
+    } else if (shouldCompactSingleBlockChild) {
+      content = content.replace(/\n\s*\n/g, '\n');
+    }
 
     const hasOnlyNestedList = node.childNodes.length > 0 &&
       Array.from(node.childNodes).every((child: Node) => {

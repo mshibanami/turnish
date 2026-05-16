@@ -590,6 +590,24 @@ describe('Turnish', () => {
         expect(turnish.render(input)).toBe("- First paragraph\n    \n    Second paragraph\n    \n- Single paragraph");
     });
 
+    it('ul with single paragraph followed by nested list items does not add blank lines', () => {
+        const turnish = new Turnish();
+        const input = "<ul><li><p>Item 1</p><ul><li><p>Item 2</p></li><li><p>Item 3</p></li></ul></li></ul>";
+        expect(turnish.render(input)).toBe("- Item 1\n    - Item 2\n    - Item 3");
+    });
+
+    it('ul with nested single-block wrappers does not add blank lines', () => {
+        const turnish = new Turnish();
+        const input = "<ul><li><div><p>Item 1</p></div></li></ul>";
+        expect(turnish.render(input)).toBe("- Item 1");
+    });
+
+    it('preserves blank lines for deeply nested multi-paragraph items', () => {
+        const turnish = new Turnish();
+        const input = "<ul><li><div><div><p>A</p><p>B</p></div></div></li></ul>";
+        expect(turnish.render(input)).toBe("- A\n    \n    B");
+    });
+
     it('ol with paragraphs', () => {
         const turnish = new Turnish();
         const input = "<ol>\n      <li>\n        <p>This is a paragraph in a list item.</p>\n        <p>This is a paragraph in the same list item as above.</p>\n      </li>\n      <li>\n        <p>A paragraph in a second list item.</p>\n      </li>\n    </ol>";
