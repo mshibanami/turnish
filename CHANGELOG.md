@@ -1,5 +1,11 @@
 # turnish
 
+## 1.12.2
+
+### Patch Changes
+
+- 8a78a6b: Fixed Turnish not working in Node
+
 ## 1.12.1
 
 ### Patch Changes
