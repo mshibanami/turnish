@@ -106,7 +106,6 @@
       font-size: 0.875em;
     }
   </style>
-  <script src="./dist/index.iife.js"></script>
 </head>
 
 <body>
@@ -278,17 +277,19 @@ console.log(
   <footer>
     <p>© 2025 <a href="http://mshibanami.github.io/">Manabu Nakazawa</a></p>
   </footer>
-  <script>
+  <script type="module">
+    import Turnish from './dist/index.mjs'
+
     (function () {
       var input = document.getElementById('input')
       var output = document.getElementById('output')
       var optionsForm = document.getElementById('options')
-      var turnish = new window.Turnish(options())
+      var turnish = new Turnish(options())
 
       input.addEventListener('input', update)
 
       optionsForm.addEventListener('change', function () {
-        turnish = new window.Turnish(options())
+        turnish = new Turnish(options())
         update()
       })
 
