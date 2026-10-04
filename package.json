@@ -10,7 +10,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build --mode browser-esm && vite build --mode browser-global && vite build --mode node-esm && vite build --mode node-cjs",
     "dev": "vite",
     "prepare": "npm run build",
     "test": "npm run build && vitest run",
@@ -23,7 +23,10 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "browser": "./dist/index.mjs",
-      "node": "./dist/index.cjs",
+      "node": {
+        "import": "./dist/index.node.mjs",
+        "require": "./dist/index.cjs"
+      },
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"

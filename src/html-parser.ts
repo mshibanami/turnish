@@ -1,3 +1,5 @@
+import { parseWithoutNativeDOM } from '@/dom-fallback'
+
 /*
  * Set up window for Node.js
  */
@@ -31,11 +33,6 @@ export class HTMLParser {
 }
 
 function createParser(): HTMLParser {
-  const isBrowser =
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined' &&
-    (typeof process === 'undefined' || (process as any).browser === true)
-
   if (typeof window !== 'undefined') {
     // Browser environment: use DOM API
     class HTMLParserBrowser extends HTMLParser {
@@ -49,16 +46,12 @@ function createParser(): HTMLParser {
     }
     return new HTMLParserBrowser()
   } else {
-    // Node environment: use domino
-    const domino = require('@mixmark-io/domino') as {
-      createDocument: (html: string) => Document
-    }
-    class HTMLParserNode extends HTMLParser {
+    class HTMLParserFallback extends HTMLParser {
       parseFromString(input: string, _type?: string): Document {
-        return domino.createDocument(input);
+        return parseWithoutNativeDOM(input);
       }
     }
-    return new HTMLParserNode()
+    return new HTMLParserFallback()
   }
 }
 
