@@ -132,8 +132,13 @@ export default class Turnish {
     if (input === '') {
       return '';
     }
-    const output = this.process(RootNode(input, this.options));
-    return this.postProcess(output);
+    const endConversion = this.rules.beginConversion();
+    try {
+      const output = this.process(RootNode(input, this.options));
+      return this.postProcess(output);
+    } finally {
+      endConversion();
+    }
   }
 
   /**

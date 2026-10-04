@@ -52,6 +52,24 @@ export class Rules {
     }
   }
 
+  beginConversion(): () => void {
+    const statefulRules = this.array.filter(rule => rule.references || rule.urlReferenceIdMap);
+    const previousStates = statefulRules.map(rule => ({
+      references: rule.references,
+      urlReferenceIdMap: rule.urlReferenceIdMap,
+    }));
+    for (const rule of statefulRules) {
+      if (rule.references) rule.references = [];
+      if (rule.urlReferenceIdMap) rule.urlReferenceIdMap = new Map();
+    }
+    return () => {
+      statefulRules.forEach((rule, index) => {
+        rule.references = previousStates[index].references;
+        rule.urlReferenceIdMap = previousStates[index].urlReferenceIdMap;
+      });
+    };
+  }
+
   add(key: string, rule: Rule): void {
     this.array.unshift(rule);
   }
