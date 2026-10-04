@@ -66,5 +66,6 @@
   "homepage": "https://mshibanami.github.io/turnish/",
   "bugs": {
     "url": "https://github.com/mshibanami/turnish/issues"
-  }
+  },
+  "sideEffects": false
 }
