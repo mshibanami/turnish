@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm build && changeset publish"
+    "release": "npm run build && changeset publish"
   },
   "exports": {
     ".": {
