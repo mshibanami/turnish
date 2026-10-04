@@ -1,6 +1,6 @@
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
-import { isBlock, isCodeBlock, isTransparentWrapper, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
+import { isBlock, isCodeBlock, isTransparentWrapper, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, splitBlockEdges, trimNewlines, wrapInlineContent } from '@/utilities';
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
@@ -257,7 +257,8 @@ defaultRules.inlineLink = {
     );
   },
   replacement: function (content: string, node: Node): string {
-    const sanitizedContent = sanitizedLinkContent(content);
+    const { leading, body, trailing } = splitBlockEdges(content);
+    const sanitizedContent = sanitizedLinkContent(body);
     let href = (node as Element)
       .getAttribute('href')
       ?.replace(/([()])/g, '\\$1');
@@ -269,7 +270,7 @@ defaultRules.inlineLink = {
     } else {
       title = '';
     }
-    return '[' + sanitizedContent + '](' + href + title + ')';
+    return leading + '[' + sanitizedContent + '](' + href + title + ')' + trailing;
   }
 };
 
@@ -285,6 +286,8 @@ const referenceLinkRule: RequireOnly<Rule, "urlReferenceIdMap" | "references"> =
   replacement: function (content: string, node: Node, options: TurnishOptions): string {
     const self = referenceLinkRule;
 
+    const { leading, body, trailing } = splitBlockEdges(content);
+    content = sanitizedLinkContent(body);
     const href = (node as Element).getAttribute('href');
     let title: string;
     const titleAttr = (node as Element).getAttribute('title');
@@ -335,7 +338,7 @@ const referenceLinkRule: RequireOnly<Rule, "urlReferenceIdMap" | "references"> =
         self.references.push(reference);
       }
     }
-    return replacement;
+    return leading + replacement + trailing;
   },
   references: [],
   urlReferenceIdMap: new Map<string, number>(),
@@ -356,18 +359,14 @@ defaultRules.referenceLink = referenceLinkRule;
 defaultRules.emphasis = {
   filter: ['em', 'i'],
   replacement: (content: string, _node: Node, options: TurnishOptions): string => {
-    content = content.trim();
-    if (!content) { return ''; }
-    return options.emDelimiter + content + options.emDelimiter;
+    return wrapInlineContent(content, text => options.emDelimiter + text + options.emDelimiter);
   }
 };
 
 defaultRules.strong = {
   filter: ['strong', 'b'],
   replacement: (content: string, _node: Node, options: TurnishOptions): string => {
-    content = content.trim();
-    if (!content) { return ''; }
-    return options.strongDelimiter + content + options.strongDelimiter;
+    return wrapInlineContent(content, text => options.strongDelimiter + text + options.strongDelimiter);
   }
 };
 
@@ -377,8 +376,10 @@ defaultRules.code = {
     const isCodeBlockNode = isCodeBlock(parent);
     return node.nodeName === 'CODE' && !isCodeBlockNode;
   },
-  replacement: (content: string): string => {
-    const trimmed = content.replace(/\r?\n|\r/g, ' ');
+  replacement: (content: string, _node: Node, options: TurnishOptions): string => {
+    const trimmed = options.preformattedCode
+      ? content.replace(/\r?\n|\r/g, ' ')
+      : content.trim().replace(/[ \t]*(?:\r?\n|\r)\s*/g, ' ');
     const extraSpace = /^`|^ .*?[^ ].* $|`$/.test(trimmed) ? ' ' : '';
     let delimiter = '`';
     const matches: string[] = trimmed.match(/`+/gm) || [];

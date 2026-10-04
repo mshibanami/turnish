@@ -233,6 +233,51 @@ export function sanitizedLinkContent(content: string): string {
     .trim();
 }
 
+const leadingBlockBreak = /^(?:[ \t]*\n){2,}/;
+const trailingBlockBreak = /(?:\n[ \t]*){2,}$/;
+const blockBreak = /\n[ \t]*\n/;
+
+export function splitBlockEdges(content: string): { leading: string; body: string; trailing: string } {
+  const leading = leadingBlockBreak.test(content) ? '\n\n' : '';
+  const trailing = trailingBlockBreak.test(content) ? '\n\n' : '';
+  return { leading, body: content.trim(), trailing };
+}
+
+const fencePattern = /^\s*(`{3,}|~{3,})/;
+const unwrappableLinePattern = /^\s*(?:$|\||(?:[-*_]\s*){3,}$|=+\s*$)/;
+const blockPrefixPattern = /^(\s*(?:>\s?)*(?:(?:[-+*]|\d+\.)\s+|#{1,6}\s+)?)(.*?)(\s*)$/;
+
+export function wrapInlineContent(content: string, wrap: (text: string) => string): string {
+  const { leading, body, trailing } = splitBlockEdges(content);
+  if (!body) {
+    return '';
+  }
+  if (!blockBreak.test(content)) {
+    return leading + wrap(body) + trailing;
+  }
+
+  let fence: string | null = null;
+  const lines = body.split('\n').map(line => {
+    const fenceMatch = line.match(fencePattern);
+    if (fence) {
+      if (fenceMatch && fenceMatch[1].startsWith(fence)) {
+        fence = null;
+      }
+      return line;
+    }
+    if (fenceMatch) {
+      fence = fenceMatch[1];
+      return line;
+    }
+    if (unwrappableLinePattern.test(line)) {
+      return line;
+    }
+    const match = line.match(blockPrefixPattern);
+    return match && match[2] ? match[1] + wrap(match[2]) + match[3] : line;
+  });
+  return leading + lines.join('\n') + trailing;
+}
+
 export function sanitizedLinkTitle(content: string): string {
   const sanitized = sanitizeWhitespace(content);
   return sanitized
