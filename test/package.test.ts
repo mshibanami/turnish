@@ -54,6 +54,17 @@ describe('Published package', () => {
         expect(code).not.toContain('@mixmark-io/domino');
     });
 
+    it('declares exactly the packages the Node builds load at runtime as dependencies', () => {
+        const { dependencies = {} } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+        const isPackage = (specifier: string) => !/^(node:|[./])/.test(specifier);
+        const specifiers = (code: string, pattern: RegExp) =>
+            [...new Set([...code.matchAll(pattern)].map((match) => match[1]).filter(isPackage))].sort();
+
+        const declared = Object.keys(dependencies).sort();
+        expect(specifiers(dist('index.node.mjs'), /\bfrom\s*["']([^"']+)["']/g)).toEqual(declared);
+        expect(specifiers(dist('index.cjs'), /\brequire\(["']([^"']+)["']\)/g)).toEqual(declared);
+    });
+
     it('does not use require() in the Node ESM build', () => {
         const code = dist('index.node.mjs');
         expect(code).not.toMatch(/\brequire\(/);

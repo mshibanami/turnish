@@ -8,13 +8,13 @@ importers:
 
   .:
     dependencies:
-      '@adobe/css-tools':
-        specifier: ^4.4.4
-        version: 4.4.4
       '@mixmark-io/domino':
         specifier: ^2.2.0
         version: 2.2.0
     devDependencies:
+      '@adobe/css-tools':
+        specifier: ^4.4.4
+        version: 4.4.4
       '@changesets/changelog-github':
         specifier: ^0.5.2
         version: 0.5.2
@@ -35,7 +35,7 @@ importers:
         version: 7.3.3(@types/node@24.12.4)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@24.12.4)(rollup@4.60.4)(supports-color@8.1.1)(typescript@5.9.3)(vite@7.3.3(@types/node@24.12.4))
+        version: 4.5.4(@types/node@24.12.4)(rollup@4.60.4)(typescript@5.9.3)(vite@7.3.3(@types/node@24.12.4))
       vitest:
         specifier: ^4.1.6
         version: 4.1.6(@types/node@24.12.4)(vite@7.3.3(@types/node@24.12.4))
@@ -567,11 +567,6 @@ packages:
 
   '@volar/typescript@2.4.28':
     resolution: {integrity: sha512-Ja6yvWrbis2QtN4ClAKreeUZPVYMARDYZl9LMEv1iQ1QdepB6wn0jTRxA9MftYmYa4DQ4k/DaSZpFPUfxl8giw==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   '@vue/compiler-core@3.5.34':
     resolution: {integrity: sha512-s9cLyK5mLcvZ4Agva5QgRsQyLKvts9WbU9DB6NqiZkkGEdwmcEiylj5Jbwkp680drF/NNCV8OlAJSe+yMLxaJw==}
@@ -1823,13 +1818,11 @@ snapshots:
 
   '@volar/source-map@2.4.28': {}
 
-  '@volar/typescript@2.4.28(typescript@5.9.3)':
+  '@volar/typescript@2.4.28':
     dependencies:
       '@volar/language-core': 2.4.28
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
-    optionalDependencies:
-      typescript: 5.9.3
 
   '@vue/compiler-core@3.5.34':
     dependencies:
@@ -1939,11 +1932,9 @@ snapshots:
 
   de-indent@1.0.2: {}
 
-  debug@4.4.3(supports-color@8.1.1):
+  debug@4.4.3:
     dependencies:
       ms: 2.1.3
-    optionalDependencies:
-      supports-color: 8.1.1
 
   detect-indent@6.1.0: {}
 
@@ -2397,14 +2388,14 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  vite-plugin-dts@4.5.4(@types/node@24.12.4)(rollup@4.60.4)(supports-color@8.1.1)(typescript@5.9.3)(vite@7.3.3(@types/node@24.12.4)):
+  vite-plugin-dts@4.5.4(@types/node@24.12.4)(rollup@4.60.4)(typescript@5.9.3)(vite@7.3.3(@types/node@24.12.4)):
     dependencies:
       '@microsoft/api-extractor': 7.58.7(@types/node@24.12.4)
       '@rollup/pluginutils': 5.3.0(rollup@4.60.4)
-      '@volar/typescript': 2.4.28(typescript@5.9.3)
+      '@volar/typescript': 2.4.28
       '@vue/language-core': 2.2.0(typescript@5.9.3)
       compare-versions: 6.1.1
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3
       kolorist: 1.8.0
       local-pkg: 1.1.2
       magic-string: 0.30.21
