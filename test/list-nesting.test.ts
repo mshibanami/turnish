@@ -66,4 +66,51 @@ describe('List nesting', () => {
                 .toBe('- T\n    \n    ```\n    - x\n    1. y\n    z\n    ```');
         });
     });
+
+    describe('ordered list numbering', () => {
+        it('counts only list items', () => {
+            expect(render('<ol><li>a</li><template></template><li>b</li></ol>')).toBe('1. a\n2. b');
+            expect(render('<ol><li>a</li><div>x</div><li>b</li></ol>')).toBe('1. a\n\nx\n\n2. b');
+        });
+
+        it('numbers items that are wrapped inside the list', () => {
+            expect(render('<ol><span><li>a</li><li>b</li></span></ol>')).toBe('1. a\n2. b');
+            expect(render('<ol><li>a</li><div><li>b</li><li>c</li></div></ol>')).toBe('1. a\n2. b\n3. c');
+            expect(render('<ol><x-w style="display: contents;"><li>a</li></x-w><x-w style="display: contents;"><li>b</li></x-w></ol>'))
+                .toBe('1. a\n2. b');
+        });
+
+        it('separates wrapped items of a bullet list', () => {
+            expect(render('<ul><x-w style="display: contents;"><li>a</li></x-w><x-w style="display: contents;"><li>b</li></x-w></ul>'))
+                .toBe('- a\n- b');
+        });
+
+        it('numbers nested lists independently', () => {
+            expect(render('<ol><li>a<ol><li>x</li><li>y</li></ol></li><li>b</li></ol>'))
+                .toBe('1. a\n    1. x\n    2. y\n2. b');
+        });
+
+        it('honors the start attribute', () => {
+            expect(render('<ol start="3"><li>a</li><li>b</li></ol>')).toBe('3. a\n4. b');
+            expect(render('<ol start="0"><li>a</li><li>b</li></ol>')).toBe('0. a\n1. b');
+        });
+
+        it('ignores an invalid start attribute', () => {
+            expect(render('<ol start="x"><li>a</li><li>b</li></ol>')).toBe('1. a\n2. b');
+        });
+
+        it('honors the value attribute of items', () => {
+            expect(render('<ol><li>a</li><li value="5">b</li><li>c</li></ol>')).toBe('1. a\n5. b\n6. c');
+            expect(render('<ol><li value="x">a</li><li>b</li></ol>')).toBe('1. a\n2. b');
+        });
+
+        it('counts down in a reversed list', () => {
+            expect(render('<ol reversed><li>a</li><li>b</li><li>c</li></ol>')).toBe('3. a\n2. b\n1. c');
+            expect(render('<ol reversed start="10"><li>a</li><li>b</li></ol>')).toBe('10. a\n9. b');
+        });
+
+        it('uses bullets for items outside of a list', () => {
+            expect(render('<div><li>a</li><li>b</li></div>')).toBe('- a\n- b');
+        });
+    });
 });

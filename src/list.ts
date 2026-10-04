@@ -69,15 +69,86 @@ export function isTrailingNestedList(list: Node): boolean {
   return ownerListItem !== null && isLastElementWithin(list, ownerListItem);
 }
 
-function listItemMarker(item: Node, options: TurnishOptions): string {
+function getOwnerList(node: Node): Element | null {
+  let parent = node.parentNode;
+  while (parent && parent.nodeType === NodeTypes.Element) {
+    if (isList(parent)) {
+      return parent as Element;
+    }
+    if (parent.nodeName === 'LI') {
+      return null;
+    }
+    parent = parent.parentNode;
+  }
+  return null;
+}
+
+function collectOwnItems(container: Node, items: Element[]): Element[] {
+  for (const child of Array.from(container.childNodes)) {
+    if (child.nodeName === 'LI') {
+      items.push(child as Element);
+    } else if (child.nodeType === NodeTypes.Element && !isList(child)) {
+      collectOwnItems(child, items);
+    }
+  }
+  return items;
+}
+
+function parseInteger(value: string | null): number | null {
+  const match = value?.match(/^[ \t\n\f\r]*([-+]?\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+const ordinalsByList = new WeakMap<Element, Map<Element, number>>();
+
+function getOrdinals(list: Element): Map<Element, number> {
+  let ordinals = ordinalsByList.get(list);
+  if (ordinals) {
+    return ordinals;
+  }
+  ordinals = new Map<Element, number>();
+  const items = collectOwnItems(list, []);
+  const reversed = list.hasAttribute('reversed');
+  let next = parseInteger(list.getAttribute('start')) ?? (reversed ? items.length : 1);
+  for (const item of items) {
+    const ordinal = parseInteger(item.getAttribute('value')) ?? next;
+    ordinals.set(item, ordinal);
+    next = ordinal + (reversed ? -1 : 1);
+  }
+  ordinalsByList.set(list, ordinals);
+  return ordinals;
+}
+
+function listItemMarker(item: Element, list: Element | null, options: TurnishOptions): string {
   const spacing = ' '.repeat(options.listMarkerSpaceCount);
-  const parent = item.parentNode as Element;
-  if (parent.nodeName !== 'OL') {
+  if (!list || list.nodeName !== 'OL') {
     return options.bulletListMarker + spacing;
   }
-  const start = parent.getAttribute('start');
-  const index = Array.prototype.indexOf.call(parent.children, item);
-  return (start ? Number(start) + index : index + 1) + '.' + spacing;
+  return getOrdinals(list).get(item) + '.' + spacing;
+}
+
+function isFollowedWithinList(item: Element, list: Element | null): boolean {
+  if (!list) {
+    return item.nextSibling !== null;
+  }
+  let current: Node = item;
+  while (current !== list) {
+    if (current.nextSibling) {
+      return true;
+    }
+    current = current.parentNode as Node;
+  }
+  return false;
+}
+
+export function isListItemWrapper(node: Node): boolean {
+  if (!isGenericBlockContainer(node) || getOwnerList(node) === null) {
+    return false;
+  }
+  const children = Array.from(node.childNodes).filter(child => !isBlankText(child));
+  return children.length > 0 && children.every(child =>
+    child.nodeName === 'LI' || isListItemWrapper(child)
+  );
 }
 
 function hasSingleContentBlock(item: Element): boolean {
@@ -116,6 +187,7 @@ export function renderListItem(content: string, item: Element, options: TurnishO
   content = normalizeItemSpacing(content, item).replace(/\n/g, '\n' + indent);
 
   const hasOnlyNestedList = containsOnlyLists(item) && content.trim() !== '';
-  const prefix = hasOnlyNestedList ? indent : listItemMarker(item, options);
-  return prefix + content + (item.nextSibling ? '\n' : '');
+  const list = getOwnerList(item);
+  const prefix = hasOnlyNestedList ? indent : listItemMarker(item, list, options);
+  return prefix + content + (isFollowedWithinList(item, list) ? '\n' : '');
 }

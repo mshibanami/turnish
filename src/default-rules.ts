@@ -1,7 +1,7 @@
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
 import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, splitBlockEdges, trimNewlines, wrapInlineContent } from '@/utilities';
-import { isList, isNestedListWrapper, isTrailingNestedList, renderListItem } from '@/list';
+import { isList, isListItemWrapper, isNestedListWrapper, isTrailingNestedList, renderListItem } from '@/list';
 
 export const defaultRules: { [key: string]: Rule } = {}
 
@@ -50,7 +50,7 @@ defaultRules.blockquote = {
 
 defaultRules.listWrapper = {
   filter: function (node: any): boolean {
-    return isNestedListWrapper(node);
+    return isNestedListWrapper(node) || isListItemWrapper(node);
   },
   replacement: function (content: string): string {
     return content;
