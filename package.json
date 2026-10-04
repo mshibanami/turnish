@@ -3,6 +3,8 @@
   "description": "HTML to Markdown converter",
   "version": "1.12.2",
   "type": "module",
+  "main": "./dist/index.cjs",
+  "types": "./dist/types/index.default-export.d.cts",
   "unpkg": "./dist/index.umd.js",
   "jsdelivr": "./dist/index.umd.js",
   "author": "Manabu Nakazawa",
@@ -21,15 +23,32 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "browser": "./dist/index.mjs",
-      "node": {
-        "import": "./dist/index.node.mjs",
-        "require": "./dist/index.cjs"
+      "browser": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.mjs"
       },
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.mjs"
+      "node": {
+        "import": {
+          "types": "./dist/types/index.d.ts",
+          "default": "./dist/index.node.mjs"
+        },
+        "require": {
+          "types": "./dist/types/index.default-export.d.cts",
+          "default": "./dist/index.cjs"
+        }
+      },
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.default-export.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.mjs"
+      }
     },
     "./package.json": "./package.json"
   },

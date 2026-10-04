@@ -1,8 +1,25 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import type { LibraryFormats, UserConfig } from 'vite';
+import fs from 'fs';
 import path from 'path';
 import dts from 'vite-plugin-dts';
+
+const withExtension = (declarations: string, extension: string) =>
+    declarations.replace(/(\bfrom\s*|\bimport\(\s*|\brequire\(\s*)(['"])(\.{1,2}\/[^'"]+)\2/g,
+        (_match, keyword, quote, specifier) => `${keyword}${quote}${specifier}${extension}${quote}`);
+
+const commonJsEntryTypes = 'index.default-export.d.cts';
+
+function writeCommonJsDeclarations(emittedFiles: Map<string, string>) {
+    for (const [filePath, content] of emittedFiles) {
+        if (!filePath.endsWith('.d.ts')) continue;
+        const target = filePath.replace(/\.d\.ts$/, '.d.cts');
+        if (path.basename(target) === commonJsEntryTypes) continue;
+        fs.writeFileSync(target, content.replace(/(['"])(\.{1,2}\/[^'"]+)\.js\1/g, '$1$2.cjs$1'));
+    }
+    fs.copyFileSync(path.resolve(__dirname, 'src', commonJsEntryTypes), path.resolve(__dirname, 'dist/types', commonJsEntryTypes));
+}
 
 interface BuildTarget {
     entry: string;
@@ -65,6 +82,8 @@ export default defineConfig(({ mode }): UserConfig => {
                     outDir: './dist/types',
                     entryRoot: './src',
                     include: ['src/**/*.ts'],
+                    beforeWriteFile: (filePath, content) => ({ filePath, content: withExtension(content, '.js') }),
+                    afterBuild: writeCommonJsDeclarations,
                 }),
             ]
             : [],
