@@ -1,6 +1,6 @@
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
-import { isBlock, isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
+import { isBlock, isCodeBlock, isTransparentWrapper, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, trimNewlines } from '@/utilities';
 import { NodeTypes } from './node';
 
 export const defaultRules: { [key: string]: Rule } = {}
@@ -48,13 +48,54 @@ defaultRules.blockquote = {
   }
 };
 
+function isList(node: Node): boolean {
+  return node.nodeName === 'UL' || node.nodeName === 'OL';
+}
+
+function isBlankText(node: Node): boolean {
+  return node.nodeType === NodeTypes.Text && /^\s*$/.test(node.nodeValue || '');
+}
+
+function getOwnerListItem(list: Node): Element | null {
+  let parent = list.parentNode;
+  while (parent && isTransparentWrapper(parent)) {
+    parent = parent.parentNode;
+  }
+  return parent && parent.nodeName === 'LI' ? parent as Element : null;
+}
+
+function isLastElementWithin(node: Node, ancestor: Element): boolean {
+  let current: Node = node;
+  while (current !== ancestor) {
+    const parent = current.parentNode as Element | null;
+    if (!parent || parent.lastElementChild !== current) {
+      return false;
+    }
+    current = parent;
+  }
+  return true;
+}
+
+function isListContainer(node: Node): boolean {
+  if (isList(node)) {
+    return true;
+  }
+  if (!isTransparentWrapper(node)) {
+    return false;
+  }
+  const children = Array.from(node.childNodes).filter(child => !isBlankText(child));
+  return children.length > 0 && children.every(child =>
+    child.nodeType === NodeTypes.Element && isListContainer(child)
+  );
+}
+
 defaultRules.list = {
   filter: function (node: any): boolean {
     return ['UL', 'OL'].includes(node.nodeName) && node.isBlock;
   },
   replacement: function (content: string, node: Node): string {
-    const parent = node.parentNode as Element;
-    if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
+    const ownerListItem = getOwnerListItem(node);
+    if (ownerListItem && isLastElementWithin(node, ownerListItem)) {
       return '\n' + content;
     } else {
       return '\n\n' + content + '\n\n';
@@ -78,7 +119,7 @@ defaultRules.listItem = {
       child.nodeType === NodeTypes.Text && !/^\s*$/.test(child.nodeValue || '')
     );
     const elementChildren = Array.from((node as Element).children);
-    const nonListElementChildren = elementChildren.filter(child => !['UL', 'OL'].includes(child.nodeName));
+    const nonListElementChildren = elementChildren.filter(child => !isListContainer(child));
     const hasSingleBlockElementChild = nonListElementChildren.length === 1 &&
       isBlock(nonListElementChildren[0]);
 
@@ -121,8 +162,8 @@ defaultRules.listItem = {
 
     const hasOnlyNestedList = node.childNodes.length > 0 &&
       Array.from(node.childNodes).every((child: Node) => {
-        return (child.nodeType === NodeTypes.Text && /^\s*$/.test(child.nodeValue || ''))
-          || (child.nodeType === NodeTypes.Element && ['UL', 'OL'].includes(child.nodeName));
+        return isBlankText(child)
+          || (child.nodeType === NodeTypes.Element && isListContainer(child));
       });
     if (hasOnlyNestedList && content.trim() !== '') {
       // This list item only contains a nested list, don't duplicate marker
@@ -132,11 +173,8 @@ defaultRules.listItem = {
     let nestingLevel = 0;
     let currentNode: Node | null = parent;
     while (currentNode) {
-      if (currentNode.nodeName === 'UL' || currentNode.nodeName === 'OL') {
-        const grandparent = currentNode.parentNode as Element | null;
-        if (grandparent && grandparent.nodeName === 'LI') {
-          nestingLevel++;
-        }
+      if (isList(currentNode) && getOwnerListItem(currentNode)) {
+        nestingLevel++;
       }
       currentNode = currentNode.parentNode;
     }

@@ -110,6 +110,35 @@ function isRowItem(element: Element): boolean {
   return false;
 }
 
+const atomicInlineElements = ['BUTTON', 'METER', 'PROGRESS', 'SELECT', 'TEXTAREA'];
+
+function isPlainInlineBox(element: Element): boolean {
+  if (isRowItem(element)) {
+    return false;
+  }
+  const display = getInlineStyleProperty(element, 'display');
+  if (display) {
+    return display === 'inline';
+  }
+  return !is(element, blockElements) && !is(element, atomicInlineElements);
+}
+
+export function isTransparentWrapper(node: Node): boolean {
+  if (node.nodeType !== NodeTypes.Element) {
+    return false;
+  }
+  const element = node as Element;
+  return getInlineStyleProperty(element, 'display') === 'contents' || isPlainInlineBox(element);
+}
+
+function getFormattingParent(node: Node): Element | null {
+  let parent = getLayoutParent(node);
+  while (parent && isPlainInlineBox(parent)) {
+    parent = getLayoutParent(parent);
+  }
+  return parent;
+}
+
 export function isBlock(node: Node): boolean {
   if (node.nodeType === NodeTypes.Element) {
     const element = node as Element;
@@ -123,7 +152,7 @@ export function isBlock(node: Node): boolean {
       return false;
     }
 
-    const parent = getLayoutParent(element);
+    const parent = getFormattingParent(element);
     if (parent && !isBlock(parent)) {
       return false;
     }
