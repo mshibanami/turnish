@@ -37,6 +37,26 @@ describe('Layout Context', () => {
         expect(result).toBe('ポスト シェア');
     });
 
+    describe('repeated declarations in a style attribute', () => {
+        it('uses the last declaration of a property', () => {
+            const turnish = new Turnish();
+            const html = '<div style="display: block; display: inline;">A</div><div style="display: block; display: inline;">B</div>';
+            expect(turnish.render(html)).toBe('AB');
+        });
+
+        it('prefers an !important declaration over later ones', () => {
+            const turnish = new Turnish();
+            const html = '<div style="display: inline !important; display: block;">A</div><div style="display: inline !important; display: block;">B</div>';
+            expect(turnish.render(html)).toBe('AB');
+        });
+
+        it('uses the last of several !important declarations', () => {
+            const turnish = new Turnish();
+            const html = '<span style="display: inline !important; display: block !important;">A</span><span style="display: inline !important; display: block !important;">B</span>';
+            expect(turnish.render(html)).toBe('A\n\nB');
+        });
+    });
+
     describe('blocks inside inline wrappers', () => {
         const wrappers: Array<[string, string, string]> = [
             ['unstyled span', '<span>', '</span>'],

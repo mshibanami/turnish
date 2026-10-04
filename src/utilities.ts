@@ -36,6 +36,8 @@ interface ParsedInlineStyle {
 
 const inlineStyleCache = new WeakMap<Element, ParsedInlineStyle>();
 
+const importantPattern = /\s*!important\s*$/i;
+
 function parseInlineStyle(style: string): Map<string, string> {
   const declarations = new Map<string, string>();
   const o = CSSTools.parse('x {' + style + '}');
@@ -43,14 +45,20 @@ function parseInlineStyle(style: string): Map<string, string> {
   if (!rule || !('declarations' in rule) || !rule.declarations) {
     return declarations;
   }
+  const importantProperties = new Set<string>();
   for (const decl of rule.declarations) {
     if (!('property' in decl) || !('value' in decl) || !decl.value) {
       continue;
     }
     const property = decl.property.toLowerCase();
-    if (!declarations.has(property)) {
-      declarations.set(property, decl.value.replace(/\s*!important\s*$/, '').trim().toLowerCase());
+    const isImportant = importantPattern.test(decl.value);
+    if (importantProperties.has(property) && !isImportant) {
+      continue;
     }
+    if (isImportant) {
+      importantProperties.add(property);
+    }
+    declarations.set(property, decl.value.replace(importantPattern, '').trim().toLowerCase());
   }
   return declarations;
 }
