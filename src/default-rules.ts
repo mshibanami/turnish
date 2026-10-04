@@ -1,7 +1,7 @@
 import { Rule } from '@/rules';
 import { TurnishOptions } from '@/index';
-import { isBlock, isCodeBlock, isTransparentWrapper, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, splitBlockEdges, trimNewlines, wrapInlineContent } from '@/utilities';
-import { NodeTypes } from './node';
+import { isCodeBlock, repeat, RequireOnly, sanitizedLinkContent, sanitizedLinkTitle, splitBlockEdges, trimNewlines, wrapInlineContent } from '@/utilities';
+import { isList, isNestedListWrapper, isTrailingNestedList, renderListItem } from '@/list';
 
 export const defaultRules: { [key: string]: Rule } = {}
 
@@ -48,58 +48,21 @@ defaultRules.blockquote = {
   }
 };
 
-function isList(node: Node): boolean {
-  return node.nodeName === 'UL' || node.nodeName === 'OL';
-}
-
-function isBlankText(node: Node): boolean {
-  return node.nodeType === NodeTypes.Text && /^\s*$/.test(node.nodeValue || '');
-}
-
-function getOwnerListItem(list: Node): Element | null {
-  let parent = list.parentNode;
-  while (parent && isTransparentWrapper(parent)) {
-    parent = parent.parentNode;
+defaultRules.listWrapper = {
+  filter: function (node: any): boolean {
+    return isNestedListWrapper(node);
+  },
+  replacement: function (content: string): string {
+    return content;
   }
-  return parent && parent.nodeName === 'LI' ? parent as Element : null;
-}
-
-function isLastElementWithin(node: Node, ancestor: Element): boolean {
-  let current: Node = node;
-  while (current !== ancestor) {
-    const parent = current.parentNode as Element | null;
-    if (!parent || parent.lastElementChild !== current) {
-      return false;
-    }
-    current = parent;
-  }
-  return true;
-}
-
-function isListContainer(node: Node): boolean {
-  if (isList(node)) {
-    return true;
-  }
-  if (!isTransparentWrapper(node)) {
-    return false;
-  }
-  const children = Array.from(node.childNodes).filter(child => !isBlankText(child));
-  return children.length > 0 && children.every(child =>
-    child.nodeType === NodeTypes.Element && isListContainer(child)
-  );
-}
+};
 
 defaultRules.list = {
   filter: function (node: any): boolean {
-    return ['UL', 'OL'].includes(node.nodeName) && node.isBlock;
+    return isList(node) && node.isBlock;
   },
   replacement: function (content: string, node: Node): string {
-    const ownerListItem = getOwnerListItem(node);
-    if (ownerListItem && isLastElementWithin(node, ownerListItem)) {
-      return '\n' + content;
-    } else {
-      return '\n\n' + content + '\n\n';
-    }
+    return isTrailingNestedList(node) ? '\n' + content : '\n\n' + content + '\n\n';
   }
 };
 
@@ -108,82 +71,7 @@ defaultRules.listItem = {
     return node.nodeName === 'LI' && node.isBlock;
   },
   replacement: function (content: string, node: Node, options: TurnishOptions): string {
-    let prefix = options.bulletListMarker + ' '.repeat(options.listMarkerSpaceCount);
-    const parent = node.parentNode as Element;
-    if (parent.nodeName === 'OL') {
-      const start = parent.getAttribute('start');
-      const index = Array.prototype.indexOf.call(parent.children, node);
-      prefix = (start ? Number(start) + index : index + 1) + '.' + ' '.repeat(options.listMarkerSpaceCount);
-    }
-    const nonWhitespaceTextNodes = Array.from(node.childNodes).filter((child: Node) =>
-      child.nodeType === NodeTypes.Text && !/^\s*$/.test(child.nodeValue || '')
-    );
-    const elementChildren = Array.from((node as Element).children);
-    const nonListElementChildren = elementChildren.filter(child => !isListContainer(child));
-    const hasSingleBlockElementChild = nonListElementChildren.length === 1 &&
-      isBlock(nonListElementChildren[0]);
-
-    let wrapperHasMultipleSegments = false;
-    if (hasSingleBlockElementChild) {
-      let current = nonListElementChildren[0];
-      while (current) {
-        const children = Array.from(current.children);
-        const blocks = children.filter(child => isBlock(child));
-        if (blocks.length > 1) {
-          wrapperHasMultipleSegments = true;
-          break;
-        }
-        if (blocks.length === 0) {
-          break;
-        }
-        const hasSignificantText = Array.from(current.childNodes).some(n =>
-          n.nodeType === NodeTypes.Text && n.parentNode === current && !/^\s*$/.test(n.nodeValue || '')
-        );
-        if (hasSignificantText) {
-          wrapperHasMultipleSegments = true;
-          break;
-        }
-        current = blocks[0];
-      }
-    }
-
-    const shouldCompactSingleBlockChild =
-      hasSingleBlockElementChild &&
-      nonWhitespaceTextNodes.length === 0 &&
-      !wrapperHasMultipleSegments;
-
-    const isParagraph = /\n$/.test(content);
-    content = trimNewlines(content);
-    if (isParagraph && !shouldCompactSingleBlockChild) {
-      content += '\n';
-    } else if (shouldCompactSingleBlockChild) {
-      content = content.replace(/\n\s*\n/g, '\n');
-    }
-
-    const hasOnlyNestedList = node.childNodes.length > 0 &&
-      Array.from(node.childNodes).every((child: Node) => {
-        return isBlankText(child)
-          || (child.nodeType === NodeTypes.Element && isListContainer(child));
-      });
-    if (hasOnlyNestedList && content.trim() !== '') {
-      // This list item only contains a nested list, don't duplicate marker
-      return content + (node.nextSibling ? '\n' : '');
-    }
-
-    let nestingLevel = 0;
-    let currentNode: Node | null = parent;
-    while (currentNode) {
-      if (isList(currentNode) && getOwnerListItem(currentNode)) {
-        nestingLevel++;
-      }
-      currentNode = currentNode.parentNode;
-    }
-
-    let oneIndent = options.listItemIndent === 'tab' ? '\t' : ' '.repeat(options.listItemIndentSpaceCount);
-    let indent = oneIndent.repeat(nestingLevel);
-    const listMarkerRegex = /\n(?!\s*(?:\d+\.\s|[-+*]\s))/gm;
-    content = content.replace(listMarkerRegex, '\n' + oneIndent);
-    return indent + prefix + content + (node.nextSibling ? '\n' : '');
+    return renderListItem(content, node as Element, options);
   }
 };
 
