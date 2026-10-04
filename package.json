@@ -16,7 +16,7 @@
     "test": "npm run build && vitest run",
     "typecheck": "tsc --noEmit",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"
   },
   "exports": {
