@@ -242,6 +242,21 @@ rules.emphasis = {
 }
 ```
 
+#### Inline rules and block content
+
+An inline element can contain block elements (e.g. `<del><p>One</p><p>Two</p></del>`), but Markdown inline syntax cannot span blocks. `wrapInlineContent` applies delimiters to each line of the content separately, after any block marker, and keeps the block breaks around the element outside of the delimiters:
+
+```js
+import Turnish, { wrapInlineContent } from 'turnish'
+
+turnish.addRule('strikethrough', {
+  filter: ['del', 's', 'strike'],
+  replacement: function (content) {
+    return wrapInlineContent(content, text => '~~' + text + '~~')
+  }
+})
+```
+
 ### Special Rules
 
 * **Blank rule** determines how to handle blank elements. It overrides every rule (even those added via `addRule`). A node is blank if it only contains whitespace, and it's not an `<a>`, `<td>`,`<th>` or a void element. Its behaviour can be customised using the `blankReplacement` option.

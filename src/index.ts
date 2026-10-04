@@ -3,7 +3,7 @@ import { Rules, Rule, RuleFilter } from '@/rules';
 export { Rules } from '@/rules';
 export type { Rule, RuleFilter, RuleFilterFunction } from '@/rules';
 import { sanitizedHtmlAttribute, trimLeadingNewlines, trimTrailingNewlines } from '@/utilities';
-export { isCodeBlock } from '@/utilities';
+export { isCodeBlock, wrapInlineContent } from '@/utilities';
 import RootNode from '@/root-node';
 import { ExtendedNode, NodeTypes } from '@/node';
 export { NodeTypes } from '@/node';

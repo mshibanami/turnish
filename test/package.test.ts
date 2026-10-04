@@ -14,26 +14,26 @@ describe('Published package', () => {
         const turnish = new Turnish();
         console.log(JSON.stringify({
             markdown: turnish.render('<h1>Hello <b>world</b></h1>'),
-            named: [typeof Rules, typeof NodeTypes, typeof isCodeBlock],
+            named: [typeof Rules, typeof NodeTypes, typeof isCodeBlock, typeof wrapInlineContent],
         }));
     `;
-    const expected = { markdown: '# Hello **world**', named: ['function', 'object', 'function'] };
+    const expected = { markdown: '# Hello **world**', named: ['function', 'object', 'function', 'function'] };
 
     it('provides the constructor as the default export for Node ESM', () => {
         const output = runNode(['--input-type=module', '-e',
-            `import Turnish, { Rules, NodeTypes, isCodeBlock } from 'turnish';${script}`]);
+            `import Turnish, { Rules, NodeTypes, isCodeBlock, wrapInlineContent } from 'turnish';${script}`]);
         expect(JSON.parse(output)).toEqual(expected);
     });
 
     it('provides the constructor as the module for require()', () => {
         const output = runNode(['--input-type=commonjs', '-e',
-            `const Turnish = require('turnish'); const { Rules, NodeTypes, isCodeBlock } = Turnish;${script}`]);
+            `const Turnish = require('turnish'); const { Rules, NodeTypes, isCodeBlock, wrapInlineContent } = Turnish;${script}`]);
         expect(JSON.parse(output)).toEqual(expected);
     });
 
     it('keeps the default property for require() consumers that rely on it', () => {
         const output = runNode(['--input-type=commonjs', '-e',
-            `const Turnish = require('turnish').default; const { Rules, NodeTypes, isCodeBlock } = require('turnish');${script}`]);
+            `const Turnish = require('turnish').default; const { Rules, NodeTypes, isCodeBlock, wrapInlineContent } = require('turnish');${script}`]);
         expect(JSON.parse(output)).toEqual(expected);
     });
 
