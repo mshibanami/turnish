@@ -3,9 +3,8 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowJs": true,
     "strict": true,
-    "outDir": "./dist",
+    "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -20,6 +19,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "test/**/*.ts"
-  ],
+    "test/**/*.ts",
+    "vite.config.ts"
+  ]
 }
