@@ -64,10 +64,7 @@ export default defineConfig(({ mode }): UserConfig => {
                 dts({
                     outDir: './dist/types',
                     entryRoot: './src',
-                    exclude: [
-                        '**/tests/**',
-                        '**/*.test.ts'
-                    ],
+                    include: ['src/**/*.ts'],
                 }),
             ]
             : [],
