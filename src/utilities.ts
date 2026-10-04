@@ -29,29 +29,47 @@ export const blockElements = [
   'TFOOT', 'TH', 'THEAD', 'TR', 'UL', 'X-TURNISH'
 ]
 
+interface ParsedInlineStyle {
+  source: string;
+  declarations: Map<string, string>;
+}
+
+const inlineStyleCache = new WeakMap<Element, ParsedInlineStyle>();
+
+function parseInlineStyle(style: string): Map<string, string> {
+  const declarations = new Map<string, string>();
+  const o = CSSTools.parse('x {' + style + '}');
+  const rule = o.stylesheet.rules[0];
+  if (!rule || !('declarations' in rule) || !rule.declarations) {
+    return declarations;
+  }
+  for (const decl of rule.declarations) {
+    if (!('property' in decl) || !('value' in decl) || !decl.value) {
+      continue;
+    }
+    const property = decl.property.toLowerCase();
+    if (!declarations.has(property)) {
+      declarations.set(property, decl.value.replace(/\s*!important\s*$/, '').trim().toLowerCase());
+    }
+  }
+  return declarations;
+}
+
 function getInlineStyleProperty(node: Node, property: string): string | null {
   if (node.nodeType !== NodeTypes.Element) {
     return null;
   }
-  const style = (node as Element).getAttribute('style');
+  const element = node as Element;
+  const style = element.getAttribute('style');
   if (!style) {
     return null;
   }
-  const o = CSSTools.parse('x {' + style + '}');
-  if (!o.stylesheet.rules.length) {
-    return null;
+  let parsed = inlineStyleCache.get(element);
+  if (!parsed || parsed.source !== style) {
+    parsed = { source: style, declarations: parseInlineStyle(style) };
+    inlineStyleCache.set(element, parsed);
   }
-  const rule = o.stylesheet.rules[0];
-  if (!('declarations' in rule) || !rule.declarations) {
-    return null;
-  }
-  const decl = rule.declarations.find(
-    d => 'property' in d && d.property.toLowerCase() === property
-  );
-  if (!decl || !('value' in decl) || !decl.value) {
-    return null;
-  }
-  return decl.value.replace(/\s*!important\s*$/, '').trim().toLowerCase();
+  return parsed.declarations.get(property) ?? null;
 }
 
 const inlineDisplayValues = new Set([
@@ -139,7 +157,23 @@ function getFormattingParent(node: Node): Element | null {
   return parent;
 }
 
+let blockCache = new WeakMap<Node, boolean>();
+
+export function resetBlockCache(): void {
+  blockCache = new WeakMap<Node, boolean>();
+}
+
 export function isBlock(node: Node): boolean {
+  const cached = blockCache.get(node);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const result = computeIsBlock(node);
+  blockCache.set(node, result);
+  return result;
+}
+
+function computeIsBlock(node: Node): boolean {
   if (node.nodeType === NodeTypes.Element) {
     const element = node as Element;
 

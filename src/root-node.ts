@@ -1,6 +1,6 @@
 import collapseWhitespace from '@/collapse-whitespace'
 import { createHTMLParser, HTMLParser } from '@/html-parser'
-import { isBlock, isVoid, isWhitespacePreserved } from '@/utilities'
+import { isBlock, isVoid, isWhitespacePreserved, resetBlockCache } from '@/utilities'
 
 interface RootNodeOptions {
   preformattedCode?: boolean
@@ -23,6 +23,7 @@ export default function RootNode(
   } else {
     root = input.cloneNode(true) as Element
   }
+  resetBlockCache()
   collapseWhitespace({
     element: root,
     isBlock: isBlock,
