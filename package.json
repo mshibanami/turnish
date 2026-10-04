@@ -60,7 +60,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mshibanami/turnish.git"
+    "url": "git+https://github.com/mshibanami/turnish.git"
   },
-  "packageManager": "pnpm@10.34.6"
+  "packageManager": "pnpm@10.34.6",
+  "homepage": "https://mshibanami.github.io/turnish/",
+  "bugs": {
+    "url": "https://github.com/mshibanami/turnish/issues"
+  }
 }
