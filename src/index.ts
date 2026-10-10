@@ -47,6 +47,7 @@ export interface TurnishOptions {
   linkReferenceDeduplication: 'none' | 'full';
   br: string;
   preformattedCode: boolean;
+  allowHtml: boolean;
   htmlRetentionMode: 'standard' | 'preserveAll' | 'markdownIncludingHtml';
   blankReplacement: (content: string, node: ExtendedNode) => string;
   keepReplacement: (content: string, node: ExtendedNode) => string;
@@ -72,6 +73,7 @@ const defaultOptions: TurnishOptions = {
   linkReferenceDeduplication: 'full',
   br: '  ',
   preformattedCode: false,
+  allowHtml: true,
   htmlRetentionMode: 'standard',
   blankReplacement: (content: string, node: ExtendedNode): string => {
     return node.isBlock ? '\n\n' : '';

@@ -39,8 +39,10 @@ export class Rules {
       replacement: options.blankReplacement
     };
 
-    this.keepReplacement = options.keepReplacement;
-    this.markdownIncludingHtmlReplacement = options.markdownIncludingHtmlReplacement;
+    this.keepReplacement = options.allowHtml ? options.keepReplacement : options.blankReplacement;
+    this.markdownIncludingHtmlReplacement = options.allowHtml
+      ? options.markdownIncludingHtmlReplacement
+      : options.defaultReplacement;
 
     this.defaultRule = {
       replacement: options.defaultReplacement
